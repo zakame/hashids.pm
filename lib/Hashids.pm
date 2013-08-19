@@ -1,16 +1,30 @@
-# NAME
+package Hashids;
+use 5.008005;
+use strict;
+use warnings;
+
+our $VERSION = "0.01";
+
+
+
+1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
 
 Hashids - generate short hashes from numbers
 
-# SYNOPSIS
+=head1 SYNOPSIS
 
     use Hashids;
 
-# DESCRIPTION
+=head1 DESCRIPTION
 
 Hashids is ...
 
-# LICENSE
+=head1 LICENSE
 
 Copyright (C) Zak B. Elep.
 
@@ -31,6 +45,9 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# AUTHOR
+=head1 AUTHOR
 
-Zak B. Elep <zakame@cpan.org>
+Zak B. Elep E<lt>zakame@cpan.orgE<gt>
+
+=cut
+
