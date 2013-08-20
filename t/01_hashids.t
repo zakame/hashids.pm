@@ -5,111 +5,117 @@ use warnings;
 use Test::More;
 use Test::Deep;
 use Test::Exception;
-BEGIN { use_ok("Hashids"); }
+use Hashids;
+
+plan tests => 4;
 
 my $salt = "this is my salt";
 
 subtest 'basics' => sub {
+    plan tests => 7;
+
     can_ok( Hashids => "new" );
     my $hashids = Hashids->new();
     isa_ok( $hashids, 'Hashids' );
 
-    is( $hashids->salt, '' );
+    is( $hashids->salt, '', 'no salt' );
 
     $hashids = Hashids->new( salt => $salt );
-    is( $hashids->salt, $salt );
+    is( $hashids->salt, $salt, 'low salt' );
 
     subtest 'hash length' => sub {
-        is( $hashids->minHashLength, 0 );
+        plan tests => 3;
+
+        is( $hashids->minHashLength, 0, 'default minHashLength' );
 
         my $minHashLength = 8;
         $hashids = Hashids->new( minHashLength => $minHashLength );
-        is( $hashids->minHashLength, $minHashLength );
+        is( $hashids->minHashLength, $minHashLength, 'set minHashLength' );
 
         $minHashLength = 'top lol';
         throws_ok {
             Hashids->new( minHashLength => $minHashLength );
         }
-        qr/not a number/;
-
-        done_testing();
+        qr/not a number/, 'invalid minHashLength';
     };
 
     subtest 'alphabet' => sub {
-        is( $hashids->alphabet, 'x4689abdeA7kynopqrXgE5GBKLMjRz' );
+        plan tests => 4;
+
+        is( $hashids->alphabet,
+            'x4689abdeA7kynopqrXgE5GBKLMjRz',
+            'default alphabet'
+        );
 
         my $alphabet = join '' => ( 'a' .. 'z' );
         $hashids = Hashids->new( alphabet => $alphabet );
-        is( $hashids->alphabet, 'adfhijlnoprtuvxyz' );
+        is( $hashids->alphabet, 'adfhijlnoprtuvxyz', 'custom alphabet' );
 
         $alphabet = "abc";
         throws_ok {
             Hashids->new( alphabet => $alphabet );
         }
-        qr/must contain at least 4/;
+        qr/must contain at least 4/, 'at least 4 chars';
 
         $alphabet = "abca";
         throws_ok {
             Hashids->new( alphabet => $alphabet );
         }
-        qr/must contain unique/;
-
-        done_testing();
+        qr/must contain unique/, 'must have unique chars';
     };
 
     subtest 'seps and guards' => sub {
-        ok( $hashids->seps );
-        ok( $hashids->guards );
+        plan tests => 2;
 
-        done_testing();
+        ok( $hashids->seps,   'has seps' );
+        ok( $hashids->guards, 'has guards' );
     };
-
-    done_testing();
 };
 
 subtest 'internal functions' => sub {
-    is( Hashids->_consistentShuffle( '123',        'salt' ), '231' );
-    is( Hashids->_consistentShuffle( 'abcdefghij', 'salt' ), 'aichgfdebj' );
+    plan tests => 4;
 
-    is( Hashids->_hash( 123, 'abcdefghij' ), 'bcd' );
-    is( Hashids->_unhash( 'bcd', 'abcdefghij' ), 123 );
+    is( Hashids->_consistentShuffle( '123', 'salt' ), '231', 'shuffle 1' );
+    is( Hashids->_consistentShuffle( 'abcdefghij', 'salt' ),
+        'aichgfdebj', 'shuffle 2' );
 
-    done_testing();
+    is( Hashids->_hash( 123, 'abcdefghij' ), 'bcd', 'internal hash' );
+    is( Hashids->_unhash( 'bcd', 'abcdefghij' ), 123, 'internal unhash' );
 };
 
 subtest 'simple encrypt/decrypt' => sub {
+    plan tests => 6;
+
     my $hashids = Hashids->new( salt => $salt );
 
-    is( $hashids->encrypt(),               '' );
-    is( $hashids->encrypt('up the wazoo'), '' );
+    is( $hashids->encrypt(),               '', 'no encrypt' );
+    is( $hashids->encrypt('up the wazoo'), '', 'bad encrypt' );
 
     my $plaintext = 123;
     my $encrypted = 'a79';
-    is( $hashids->encrypt($plaintext), $encrypted );
-    is( $hashids->decrypt($encrypted), $plaintext );
+    is( $hashids->encrypt($plaintext), $encrypted, 'encrypt 1' );
+    is( $hashids->decrypt($encrypted), $plaintext, 'decrypt 1' );
 
     $plaintext = 123456;
     $encrypted = 'AMyLz';
-    is( $hashids->encrypt($plaintext), $encrypted );
-    is( $hashids->decrypt($encrypted), $plaintext );
-
-    done_testing();
+    is( $hashids->encrypt($plaintext), $encrypted, 'encrypt 2' );
+    is( $hashids->decrypt($encrypted), $plaintext, 'decrypt 2' );
 };
 
 subtest 'list encrypt/decrypt' => sub {
+    plan tests => 4;
+
     my $hashids = Hashids->new( salt => $salt );
 
     my @plaintexts = ( 1, 2, 3 );
     my $encrypted = 'eGtrS8';
-    is( $hashids->encrypt(@plaintexts), $encrypted );
-    cmp_deeply( $hashids->decrypt($encrypted), \@plaintexts );
+    is( $hashids->encrypt(@plaintexts), $encrypted, 'encrypt list 1' );
+    cmp_deeply( $hashids->decrypt($encrypted),
+        \@plaintexts, 'decrypt list 1' );
 
     @plaintexts = ( 123, 456, 789 );
     $encrypted = 'yn8t46hen';
-    is( $hashids->encrypt(@plaintexts), $encrypted );
-    cmp_deeply( $hashids->decrypt($encrypted), \@plaintexts );
-
-    done_testing();
+    is( $hashids->encrypt(@plaintexts), $encrypted, 'encrypt list 2' );
+    cmp_deeply( $hashids->decrypt($encrypted),
+        \@plaintexts, 'decrypt list 2' );
 };
-
-done_testing();
