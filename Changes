@@ -2,6 +2,8 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+    - Forgot salt key in SYNOPSIS
+
 0.01 2013-08-20T08:41:48Z
 
     - initial release, a straight port of hashids.js for Perl.  Expect
