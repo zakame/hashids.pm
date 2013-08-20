@@ -103,9 +103,11 @@ subtest 'simple encrypt/decrypt' => sub {
 };
 
 subtest 'list encrypt/decrypt' => sub {
-    plan tests => 4;
+    plan tests => 5;
 
     my $hashids = Hashids->new( salt => $salt );
+
+    can_ok( $hashids, qw/encrypt decrypt/ );
 
     my @plaintexts = ( 1, 2, 3 );
     my $encrypted = 'eGtrS8';
