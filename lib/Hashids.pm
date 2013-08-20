@@ -416,5 +416,10 @@ Zak B. Elep E<lt>zakame@cpan.orgE<gt>
 Original Hashids JavaScript library written by L<Ivan
 Akimov|http://twitter.com/ivanakimov>
 
+=head1 THANKS
+
+Props to L<Jofell Gallardo|http://twitter.com/jofell> for pointing this
+excellent project to me in the first place.
+
 =cut
 
