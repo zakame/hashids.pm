@@ -42,11 +42,14 @@
       },
       "runtime" : {
          "requires" : {
+            "Moo" : "1.003",
+            "Scalar::Util" : "1.31",
             "perl" : "5.008005"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0.32",
             "Test::More" : "0.98"
          }
       }
