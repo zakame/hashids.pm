@@ -5,7 +5,7 @@ Hashids - generate short hashes from numbers
 # SYNOPSIS
 
     use Hashids;
-    my $hashids = Hashids->new("this is my salt");
+    my $hashids = Hashids->new(salt => "this is my salt");
 
     # encrypt a single number
     my $hash = $hashids->encrypt(123);          # 'a79'
