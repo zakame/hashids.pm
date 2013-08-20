@@ -2,6 +2,12 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+0.03 2013-08-20T15:57:59Z
+
+    - Let the construct accept salt string only for consistency with
+      other Hashids implementations
+    - Refactor a really little bit :)
+
 0.02 2013-08-20T10:01:07Z
 
     - Forgot salt key in SYNOPSIS

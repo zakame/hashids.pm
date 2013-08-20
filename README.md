@@ -5,7 +5,7 @@ Hashids - generate short hashes from numbers
 # SYNOPSIS
 
     use Hashids;
-    my $hashids = Hashids->new(salt => "this is my salt");
+    my $hashids = Hashids->new('this is my salt');
 
     # encrypt a single number
     my $hash = $hashids->encrypt(123);          # 'a79'
@@ -44,6 +44,10 @@ value.
 
         Minimum hash length.  Use this to control how long the generated hash
         string should be.
+
+    You can also construct with just a single argument for the salt:
+
+        my $hashids = Hashids->new('this is my salt');
 
 - my $hash = $hashids->encrypt($x, \[$y, $z, ...\]);
 
@@ -85,3 +89,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Zak B. Elep <zakame@cpan.org>
 
 Original Hashids JavaScript library written by [Ivan Akimov](http://twitter.com/ivanakimov)
+
+# THANKS
+
+Props to [Jofell Gallardo](http://twitter.com/jofell) for pointing this
+excellent project to me in the first place.
