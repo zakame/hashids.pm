@@ -8,6 +8,7 @@ our $VERSION = "0.01";
 
 use Moo;
 use Scalar::Util 'looks_like_number';
+use List::MoreUtils 'firstidx';
 
 has salt => ( is => 'ro', default => '' );
 has minHashLength => (
@@ -88,6 +89,12 @@ sub encrypt {
     $self->_encode( \@num );
 }
 
+sub decrypt {
+    my ( $self, $hash ) = @_;
+    return unless $hash;
+    $self->_decode($hash);
+}
+
 sub _encode {
     my ( $self, $num, $alphabet, $salt, $minHashLength ) = @_;
 
@@ -166,6 +173,64 @@ sub _encode {
     $res;
 }
 
+sub _decode {
+    my ( $self, $hash ) = @_;
+
+    my $res = [];
+
+    if ($hash) {
+        my $orig        = $hash;
+        my $alphabet    = '';
+        my $lotteryChar = '';
+
+        my $guards = $self->guards;
+        for my $guard (@$guards) {
+            $hash =~ s/$guard/ /g;
+        }
+        my @hashSplit = split / /, $hash;
+
+        my $i = 0;
+        if ( @hashSplit == 3 or @hashSplit == 2 ) {
+            $i = 1;
+        }
+
+        $hash = $hashSplit[$i];
+
+        my $seps = $self->seps;
+        for my $sep (@$seps) {
+            $hash =~ s/$sep/ /g;
+        }
+
+        my @hash = split / /, $hash;
+
+        for ( my $i = 0; $i != @hash; $i++ ) {
+            my $subHash = $hash[$i];
+            if ($subHash) {
+                unless ($i) {
+                    $lotteryChar = substr( $hash, 0, 1 );
+                    $subHash = substr( $subHash, 1 );
+                    my $sa = $self->alphabet;
+                    $sa =~ s/$lotteryChar//;
+                    $alphabet = $lotteryChar . $sa;
+                }
+
+                if ( $alphabet and $lotteryChar ) {
+                    $alphabet = $self->_consistentShuffle( $alphabet,
+                        ( ord($lotteryChar) & 12345 ) . $self->salt );
+                    push @$res, $self->_unhash( $subHash, $alphabet );
+
+                }
+            }
+        }
+
+        if ( $self->encrypt(@$res) ne $orig ) {
+            $res = [];
+        }
+    }
+
+    @$res == 1 ? $res->[0] : $res;
+}
+
 sub _consistentShuffle {
     my ( $self, $alphabet, $salt ) = @_;
 
@@ -232,6 +297,21 @@ sub _hash {
     } while ($num);
 
     $hash;
+}
+
+sub _unhash {
+    my ( $self, $hash, $alphabet ) = @_;
+
+    my $num = 0;
+    my $pos;
+
+    my @hash = split //, $hash;
+    for ( my $i = 0; $i < @hash; $i++ ) {
+        $pos = firstidx { $_ eq $hash[$i] } split //, $alphabet;
+        $num += $pos * ( length($alphabet)**( @hash - $i - 1 ) );
+    }
+
+    $num;
 }
 
 1;

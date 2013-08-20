@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Deep;
 use Test::Exception;
 BEGIN { use_ok("Hashids"); }
 
@@ -71,6 +72,7 @@ subtest 'internal functions' => sub {
     is( Hashids->_consistentShuffle( 'abcdefghij', 'salt' ), 'aichgfdebj' );
 
     is( Hashids->_hash( 123, 'abcdefghij' ), 'bcd' );
+    is( Hashids->_unhash( 'bcd', 'abcdefghij' ), 123 );
 
     done_testing();
 };
@@ -84,12 +86,12 @@ subtest 'simple encrypt/decrypt' => sub {
     my $plaintext = 123;
     my $encrypted = 'a79';
     is( $hashids->encrypt($plaintext), $encrypted );
-    # is( $hashids->decrypt($encrypted), $plaintext );
+    is( $hashids->decrypt($encrypted), $plaintext );
 
     $plaintext = 123456;
     $encrypted = 'AMyLz';
     is( $hashids->encrypt($plaintext), $encrypted );
-    # is( $hashids->decrypt($encrypted), $plaintext );
+    is( $hashids->decrypt($encrypted), $plaintext );
 
     done_testing();
 };
@@ -100,12 +102,12 @@ subtest 'list encrypt/decrypt' => sub {
     my @plaintexts = ( 1, 2, 3 );
     my $encrypted = 'eGtrS8';
     is( $hashids->encrypt(@plaintexts), $encrypted );
-    # is( $hashids->decrypt($encrypted), \@plaintexts );
+    cmp_deeply( $hashids->decrypt($encrypted), \@plaintexts );
 
     @plaintexts = ( 123, 456, 789 );
     $encrypted = 'yn8t46hen';
     is( $hashids->encrypt(@plaintexts), $encrypted );
-    # is( $hashids->decrypt($encrypted), \@plaintexts );
+    cmp_deeply( $hashids->decrypt($encrypted), \@plaintexts );
 
     done_testing();
 };
