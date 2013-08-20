@@ -26,6 +26,13 @@ has alphabet => (
 has seps   => ( is => 'rwp', default => sub { [] } );
 has guards => ( is => 'rwp', default => sub { [] } );
 
+sub BUILDARGS {
+    my ( $class, @args ) = @_;
+    unshift @args, 'salt' if @args % 2 == 1;
+
+    return {@args};
+}
+
 sub BUILD {
     my $self = shift;
 
@@ -315,7 +322,7 @@ Hashids - generate short hashes from numbers
 =head1 SYNOPSIS
 
     use Hashids;
-    my $hashids = Hashids->new(salt => "this is my salt");
+    my $hashids = Hashids->new('this is my salt');
 
     # encrypt a single number
     my $hash = $hashids->encrypt(123);          # 'a79'
@@ -360,6 +367,10 @@ Minimum hash length.  Use this to control how long the generated hash
 string should be.
 
 =back
+
+You can also construct with just a single argument for the salt:
+
+    my $hashids = Hashids->new('this is my salt');
 
 =item  my $hash = $hashids->encrypt($x, [$y, $z, ...]);
 

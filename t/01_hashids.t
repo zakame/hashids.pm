@@ -12,7 +12,7 @@ plan tests => 4;
 my $salt = "this is my salt";
 
 subtest 'basics' => sub {
-    plan tests => 7;
+    plan tests => 8;
 
     can_ok( Hashids => "new" );
     my $hashids = Hashids->new();
@@ -22,6 +22,9 @@ subtest 'basics' => sub {
 
     $hashids = Hashids->new( salt => $salt );
     is( $hashids->salt, $salt, 'low salt' );
+
+    $hashids->new($salt);
+    is( $hashids->salt, $salt, 'single-arg constructor' );
 
     subtest 'hash length' => sub {
         plan tests => 3;
