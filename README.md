@@ -5,10 +5,59 @@ Hashids - generate short hashes from numbers
 # SYNOPSIS
 
     use Hashids;
+    my $hashids = Hashids->new("this is my salt");
+
+    # encrypt a single number
+    my $hash = $hashids->encrypt(123);          # 'a79'
+    my $number = $hashids->decrypt('a79');      # 123
+
+    # or a list
+    $hash = $hashids->encrypt(1, 2, 3);         # 'eGtrS8'
+    my $numbers = $hashids->decrypt('eGtrS8');  # [1, 2, 3]
 
 # DESCRIPTION
 
-Hashids is ...
+This is a port of the Hashids JavaScript library for Perl.
+
+Hashids was designed for use in URL shortening, tracking stuff,
+validating accounts or making pages private (through abstraction.)
+Instead of showing items as `1`, `2`, or `3`, you could show them as
+`b9iLXiAa`, `EATedTBy`, and `Aaco9cy5`.  Hashes depend on your salt
+value.
+
+# METHODS
+
+- my $hashids = Hashids->new();
+
+    Make a new Hashids object.  This constructor accepts a few options:
+
+    - salt => 'this is my salt'
+
+        Salt string, this should be unique per Hashid object.
+
+    - alphabet => 'abcdefghij'
+
+        Alphabet set to use.  This is optional as Hashids comes with a default
+        set suitable for URL shortening.
+
+    - minHashLength => 5
+
+        Minimum hash length.  Use this to control how long the generated hash
+        string should be.
+
+- my $hash = $hashids->encrypt($x, \[$y, $z, ...\]);
+
+    Encrypt a single number (or a list of numbers) into a hash string.
+
+- my $number = $hashids->decrypt($hash);
+
+    Decrypt a hash string into its number (or numbers.)  Returns either a
+    simple scalar if it is a single number, or an arrayref of numbers if it
+    decrypted a set.  Use [ref](http://search.cpan.org/perldoc?ref) on the result to ensure proper usage.
+
+# SEE ALSO
+
+[Hashids](http://www.hashids.org)
 
 # LICENSE
 
@@ -34,3 +83,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # AUTHOR
 
 Zak B. Elep <zakame@cpan.org>
+
+Original Hashids JavaScript library written by [Ivan Akimov](http://twitter.com/ivanakimov)

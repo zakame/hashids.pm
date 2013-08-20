@@ -326,10 +326,67 @@ Hashids - generate short hashes from numbers
 =head1 SYNOPSIS
 
     use Hashids;
+    my $hashids = Hashids->new("this is my salt");
+
+    # encrypt a single number
+    my $hash = $hashids->encrypt(123);          # 'a79'
+    my $number = $hashids->decrypt('a79');      # 123
+
+    # or a list
+    $hash = $hashids->encrypt(1, 2, 3);         # 'eGtrS8'
+    my $numbers = $hashids->decrypt('eGtrS8');  # [1, 2, 3]
 
 =head1 DESCRIPTION
 
-Hashids is ...
+This is a port of the Hashids JavaScript library for Perl.
+
+Hashids was designed for use in URL shortening, tracking stuff,
+validating accounts or making pages private (through abstraction.)
+Instead of showing items as C<1>, C<2>, or C<3>, you could show them as
+C<b9iLXiAa>, C<EATedTBy>, and C<Aaco9cy5>.  Hashes depend on your salt
+value.
+
+=head1 METHODS
+
+=over
+
+=item  my $hashids = Hashids->new();
+
+Make a new Hashids object.  This constructor accepts a few options:
+
+=over
+
+=item  salt => 'this is my salt'
+
+Salt string, this should be unique per Hashid object.
+
+=item  alphabet => 'abcdefghij'
+
+Alphabet set to use.  This is optional as Hashids comes with a default
+set suitable for URL shortening.
+
+=item  minHashLength => 5
+
+Minimum hash length.  Use this to control how long the generated hash
+string should be.
+
+=back
+
+=item  my $hash = $hashids->encrypt($x, [$y, $z, ...]);
+
+Encrypt a single number (or a list of numbers) into a hash string.
+
+=item  my $number = $hashids->decrypt($hash);
+
+Decrypt a hash string into its number (or numbers.)  Returns either a
+simple scalar if it is a single number, or an arrayref of numbers if it
+decrypted a set.  Use L<ref> on the result to ensure proper usage.
+
+=back
+
+=head1 SEE ALSO
+
+L<Hashids|http://www.hashids.org>
 
 =head1 LICENSE
 
@@ -355,6 +412,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 =head1 AUTHOR
 
 Zak B. Elep E<lt>zakame@cpan.orgE<gt>
+
+Original Hashids JavaScript library written by L<Ivan
+Akimov|http://twitter.com/ivanakimov>
 
 =cut
 
