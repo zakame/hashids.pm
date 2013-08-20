@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "List::MoreUtils" : "0.33",
             "Moo" : "1.003",
             "Scalar::Util" : "1.31",
             "perl" : "5.008005"
@@ -49,6 +50,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Deep" : "0.110",
             "Test::Exception" : "0.32",
             "Test::More" : "0.98"
          }
