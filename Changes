@@ -2,5 +2,6 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
-    - original version
+    - initial release, a straight port of hashids.js for Perl.  Expect
+      updates soon :)
 
