@@ -18,7 +18,7 @@ my $plaintext = 456;
 my $encrypted = 'GoBu7d';
 
 is( $subclass->encrypt($plaintext), $encrypted );
-cmp_deeply( $subclass->decrypt($encrypted),
+cmp_deeply( scalar $subclass->decrypt($encrypted),
     [ $subclass->extra_number, $plaintext ] );
 note 'decrypted: ', join ',' => @{ $subclass->decrypt($encrypted) };
 

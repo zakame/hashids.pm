@@ -228,7 +228,8 @@ sub _decode {
 
     return unless $self->Hashids::encrypt(@$res) eq $orig;
 
-    @$res == 1 ? $res->[0] : $res;
+    return unless defined wantarray;
+    wantarray ? @$res : @$res == 1 ? $res->[0] : $res;
 }
 
 sub _consistentShuffle {
@@ -327,6 +328,9 @@ Hashids - generate short hashes from numbers
 
     # or a list
     $hash = $hashids->encrypt(1, 2, 3);         # 'eGtrS8'
+    my @numbers = $hashids->decrypt('eGtrS8');  # (1, 2, 3)
+
+    # also get results in an arrayref
     my $numbers = $hashids->decrypt('eGtrS8');  # [1, 2, 3]
 
 =head1 DESCRIPTION
@@ -379,6 +383,13 @@ Decrypt a hash string into its number (or numbers.)  Returns either a
 simple scalar if it is a single number, an arrayref of numbers if it
 decrypted a set, or C<undef> if given bad input.  Use L<ref> on the
 result to ensure proper usage.
+
+You can also retrieve the result as a proper list by assigning it to an
+array variable, by doing so you will always get a list of one or more
+numbers that are decrypted from the hash, or the empty list if none were
+found:
+
+    my @numbers = $hashids->decrypt($hash);
 
 =back
 

@@ -106,7 +106,7 @@ subtest 'simple encrypt/decrypt' => sub {
 };
 
 subtest 'list encrypt/decrypt' => sub {
-    plan tests => 5;
+    plan tests => 6;
 
     my $hashids = Hashids->new( salt => $salt );
 
@@ -115,12 +115,22 @@ subtest 'list encrypt/decrypt' => sub {
     my @plaintexts = ( 1, 2, 3 );
     my $encrypted = 'eGtrS8';
     is( $hashids->encrypt(@plaintexts), $encrypted, 'encrypt list 1' );
-    cmp_deeply( $hashids->decrypt($encrypted),
+    cmp_deeply( scalar $hashids->decrypt($encrypted),
         \@plaintexts, 'decrypt list 1' );
 
     @plaintexts = ( 123, 456, 789 );
     $encrypted = 'yn8t46hen';
     is( $hashids->encrypt(@plaintexts), $encrypted, 'encrypt list 2' );
-    cmp_deeply( $hashids->decrypt($encrypted),
+    cmp_deeply( scalar $hashids->decrypt($encrypted),
         \@plaintexts, 'decrypt list 2' );
+
+    subtest 'decrypted return as list' => sub {
+        plan tests => 2;
+
+        my @single = $hashids->decrypt('a79');
+        cmp_deeply( \@single, [123], 'decrypted as list (single value)' );
+
+        my @result = $hashids->decrypt($encrypted);
+        cmp_deeply( \@result, \@plaintexts, 'decrypted as list (multi)' );
+    };
 };
