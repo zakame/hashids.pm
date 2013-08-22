@@ -2,6 +2,13 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+0.04 2013-08-22T18:10:56Z
+
+    - Fix a bug in decrypt() when subclassing
+    - Let decrypt() emit sane output in when in list context, and be
+      symmetric to encrypt()
+    - Remove Test::Deep, use Test::More::is_deeply() instead
+
 0.03 2013-08-20T15:57:59Z
 
     - Let the construct accept salt string only for consistency with

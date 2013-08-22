@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.6.2, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "Minilla/v0.6.4, CPAN::Meta::Converter version 2.132140",
    "license" : [
       "mit"
    ],
@@ -50,7 +50,6 @@
       },
       "test" : {
          "requires" : {
-            "Test::Deep" : "0.110",
             "Test::Exception" : "0.32",
             "Test::More" : "0.98"
          }
@@ -68,7 +67,7 @@
          "web" : "https://github.com/zakame/hashids.pm"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "Zak B. Elep <zakame@zakame.net>"
    ]
