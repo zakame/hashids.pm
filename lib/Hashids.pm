@@ -179,57 +179,54 @@ sub _encode {
 sub _decode {
     my ( $self, $hash ) = @_;
 
+    return unless $hash;
+
     my $res = [];
 
-    if ($hash) {
-        my $orig        = $hash;
-        my $alphabet    = '';
-        my $lotteryChar = '';
+    my $orig        = $hash;
+    my $alphabet    = '';
+    my $lotteryChar = '';
 
-        my $guards = $self->guards;
-        for my $guard (@$guards) {
-            $hash =~ s/$guard/ /g;
-        }
-        my @hashSplit = split / /, $hash;
+    my $guards = $self->guards;
+    for my $guard (@$guards) {
+        $hash =~ s/$guard/ /g;
+    }
+    my @hashSplit = split / /, $hash;
 
-        my $i = 0;
-        if ( @hashSplit == 3 or @hashSplit == 2 ) {
-            $i = 1;
-        }
+    my $i = 0;
+    if ( @hashSplit == 3 or @hashSplit == 2 ) {
+        $i = 1;
+    }
 
-        $hash = $hashSplit[$i];
+    $hash = $hashSplit[$i];
 
-        my $seps = $self->seps;
-        for my $sep (@$seps) {
-            $hash =~ s/$sep/ /g;
-        }
+    my $seps = $self->seps;
+    for my $sep (@$seps) {
+        $hash =~ s/$sep/ /g;
+    }
 
-        my @hash = split / /, $hash;
+    my @hash = split / /, $hash;
 
-        for ( my $i = 0; $i != @hash; $i++ ) {
-            my $subHash = $hash[$i];
-            if ($subHash) {
-                unless ($i) {
-                    $lotteryChar = substr( $hash, 0, 1 );
-                    $subHash = substr( $subHash, 1 );
-                    my $sa = $self->alphabet;
-                    $sa =~ s/$lotteryChar//;
-                    $alphabet = $lotteryChar . $sa;
-                }
+    for ( my $i = 0; $i != @hash; $i++ ) {
+        my $subHash = $hash[$i];
+        if ($subHash) {
+            unless ($i) {
+                $lotteryChar = substr( $hash, 0, 1 );
+                $subHash = substr( $subHash, 1 );
+                my $sa = $self->alphabet;
+                $sa =~ s/$lotteryChar//;
+                $alphabet = $lotteryChar . $sa;
+            }
 
-                if ( $alphabet and $lotteryChar ) {
-                    $alphabet = $self->_consistentShuffle( $alphabet,
-                        ( ord($lotteryChar) & 12345 ) . $self->salt );
-                    push @$res, $self->_unhash( $subHash, $alphabet );
-
-                }
+            if ( $alphabet and $lotteryChar ) {
+                $alphabet = $self->_consistentShuffle( $alphabet,
+                    ( ord($lotteryChar) & 12345 ) . $self->salt );
+                push @$res, $self->_unhash( $subHash, $alphabet );
             }
         }
-
-        if ( $self->Hashids::encrypt(@$res) ne $orig ) {
-            $res = [];
-        }
     }
+
+    return unless $self->Hashids::encrypt(@$res) eq $orig;
 
     @$res == 1 ? $res->[0] : $res;
 }
@@ -379,8 +376,9 @@ Encrypt a single number (or a list of numbers) into a hash string.
 =item  my $number = $hashids->decrypt($hash);
 
 Decrypt a hash string into its number (or numbers.)  Returns either a
-simple scalar if it is a single number, or an arrayref of numbers if it
-decrypted a set.  Use L<ref> on the result to ensure proper usage.
+simple scalar if it is a single number, an arrayref of numbers if it
+decrypted a set, or C<undef> if given bad input.  Use L<ref> on the
+result to ensure proper usage.
 
 =back
 
