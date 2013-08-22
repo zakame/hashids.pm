@@ -226,7 +226,7 @@ sub _decode {
             }
         }
 
-        if ( $self->encrypt(@$res) ne $orig ) {
+        if ( $self->Hashids::encrypt(@$res) ne $orig ) {
             $res = [];
         }
     }
