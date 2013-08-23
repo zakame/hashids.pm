@@ -30,7 +30,7 @@ sub BUILDARGS {
     my ( $class, @args ) = @_;
     unshift @args, 'salt' if @args % 2 == 1;
 
-    return {@args};
+    +{@args};
 }
 
 sub BUILD {
