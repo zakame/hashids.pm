@@ -23,8 +23,8 @@ has alphabet => (
     is      => 'rwp',
     default => sub {'xcS4F6h89aUbideAI7tkynuopqrXCgTE5GBKHLMjfRsz'}
 );
-has seps   => ( is => 'rwp', default => sub { [] } );
-has guards => ( is => 'rwp', default => sub { [] } );
+has seps   => ( is => 'rwp', default => sub { [] }, init_arg => undef );
+has guards => ( is => 'rwp', default => sub { [] }, init_arg => undef );
 
 sub BUILDARGS {
     my ( $class, @args ) = @_;
