@@ -45,6 +45,8 @@ sub BUILD {
     my @primes = ( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43 );
     my @indices = ( 0, 4, 8, 12 );
 
+    die "@alphabet must not have spaces"
+        if $alphabet =~ /\s/;
     die "@alphabet must contain at least 4 characters"
         unless @alphabet >= 4;
     {

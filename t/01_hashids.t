@@ -42,7 +42,7 @@ subtest 'basics' => sub {
     };
 
     subtest 'alphabet' => sub {
-        plan tests => 4;
+        plan tests => 5;
 
         is( $hashids->alphabet,
             'xcS4F6h89aUbideAI7tkynuopqrXCgTE5GBKHLMjfRsz',
@@ -64,6 +64,13 @@ subtest 'basics' => sub {
             Hashids->new( alphabet => $alphabet );
         }
         qr/must contain unique/, 'must have unique chars';
+
+        $alphabet = "ab cd";
+        throws_ok {
+            Hashids->new( alphabet => $alphabet );
+        }
+        qr/must not have spaces/, 'no spaces allowed';
+
     };
 
     subtest 'chars, seps, and guards' => sub {
