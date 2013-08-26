@@ -166,42 +166,38 @@ sub _decode {
     my ( $self, $hash ) = @_;
 
     return unless $hash;
+    return unless defined wantarray;
 
     my $res = [];
 
     my $orig        = $hash;
-    my $chars       = '';
     my $lotteryChar = '';
+    my $splitIndex  = 0;
 
+    my $chars  = $self->chars;
     my $guards = $self->guards;
+    my $seps   = $self->seps;
+
     for my $guard (@$guards) {
         $hash =~ s/$guard/ /g;
     }
     my @hashSplit = split / /, $hash;
-
-    my $i = 0;
     if ( @hashSplit == 3 or @hashSplit == 2 ) {
-        $i = 1;
+        $splitIndex = 1;
     }
-
-    $hash = $hashSplit[$i];
-
-    my $seps = $self->seps;
+    $hash = $hashSplit[$splitIndex];
     for my $sep (@$seps) {
         $hash =~ s/$sep/ /g;
     }
 
-    my @hash = split / /, $hash;
-
-    for ( my $i = 0; $i != @hash; $i++ ) {
-        my $subHash = $hash[$i];
-        if ($subHash) {
+    my @subHash = split / /, $hash;
+    for ( my $i = 0; $i != @subHash; $i++ ) {
+        if ( my $subHash = $subHash[$i] ) {
             unless ($i) {
                 $lotteryChar = substr( $hash, 0, 1 );
                 $subHash = substr( $subHash, 1 );
-                my $sa = $self->chars;
-                $sa =~ s/$lotteryChar//;
-                $chars = $lotteryChar . $sa;
+                $chars =~ s/$lotteryChar//;
+                $chars = $lotteryChar . $chars;
             }
 
             if ( $chars and $lotteryChar ) {
@@ -214,7 +210,6 @@ sub _decode {
 
     return unless $self->Hashids::encrypt(@$res) eq $orig;
 
-    return unless defined wantarray;
     wantarray ? @$res : @$res == 1 ? $res->[0] : $res;
 }
 
