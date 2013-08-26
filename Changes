@@ -2,6 +2,11 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+0.05 2013-08-26T10:40:41Z
+
+    - Adjust deps
+    - A lot more refactoring
+
 0.04 2013-08-22T18:10:56Z
 
     - Fix a bug in decrypt() when subclassing
