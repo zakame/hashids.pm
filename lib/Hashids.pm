@@ -16,11 +16,11 @@ has minHashLength => (
     isa => sub {
         die "$_[0] is not a number!" unless looks_like_number $_[0];
     },
-    default => sub {0}
+    default => 0
 );
 has alphabet => (
     is      => 'ro',
-    default => sub {'xcS4F6h89aUbideAI7tkynuopqrXCgTE5GBKHLMjfRsz'}
+    default => 'xcS4F6h89aUbideAI7tkynuopqrXCgTE5GBKHLMjfRsz'
 );
 
 has chars  => ( is => 'rwp', lazy => 1, init_arg => undef );
