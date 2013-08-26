@@ -324,6 +324,13 @@ Instead of showing items as C<1>, C<2>, or C<3>, you could show them as
 C<b9iLXiAa>, C<EATedTBy>, and C<Aaco9cy5>.  Hashes depend on your salt
 value.
 
+This implementation follows the v0.1.4 release of hashids.js.  The
+current version of hashids.js (v0.3.0) uses a new algorithm, so the
+hashes produced by this Perl implementation will probably I<not> decrypt
+correctly on the new JavaScript version.  I will be implementing the new
+algorithm very soon, and maybe probably allow some way to toggle between
+algorithms.
+
 =head1 METHODS
 
 =over
