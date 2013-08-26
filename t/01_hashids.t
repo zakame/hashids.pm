@@ -45,13 +45,13 @@ subtest 'basics' => sub {
         plan tests => 4;
 
         is( $hashids->alphabet,
-            'x4689abdeA7kynopqrXgE5GBKLMjRz',
+            'xcS4F6h89aUbideAI7tkynuopqrXCgTE5GBKHLMjfRsz',
             'default alphabet'
         );
 
         my $alphabet = join '' => ( 'a' .. 'z' );
         $hashids = Hashids->new( alphabet => $alphabet );
-        is( $hashids->alphabet, 'adfhijlnoprtuvxyz', 'custom alphabet' );
+        is( $hashids->alphabet, $alphabet, 'custom alphabet' );
 
         $alphabet = "abc";
         throws_ok {
@@ -66,9 +66,10 @@ subtest 'basics' => sub {
         qr/must contain unique/, 'must have unique chars';
     };
 
-    subtest 'seps and guards' => sub {
-        plan tests => 2;
+    subtest 'chars, seps, and guards' => sub {
+        plan tests => 3;
 
+        ok( $hashids->chars,  'has chars' );
         ok( $hashids->seps,   'has seps' );
         ok( $hashids->guards, 'has guards' );
     };

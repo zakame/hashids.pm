@@ -18,11 +18,12 @@ has minHashLength => (
     },
     default => sub {0}
 );
-
 has alphabet => (
-    is      => 'rwp',
+    is      => 'ro',
     default => sub {'xcS4F6h89aUbideAI7tkynuopqrXCgTE5GBKHLMjfRsz'}
 );
+
+has chars => ( is => 'rwp', default => sub {''}, init_arg => undef );
 has seps   => ( is => 'rwp', default => sub { [] }, init_arg => undef );
 has guards => ( is => 'rwp', default => sub { [] }, init_arg => undef );
 
@@ -67,8 +68,7 @@ sub BUILD {
 
     $self->_set_guards($guards);
     $self->_set_seps($seps);
-    $self->_set_alphabet(
-        $self->_consistentShuffle( $alphabet, $self->salt ) );
+    $self->_set_chars( $self->_consistentShuffle( $alphabet, $self->salt ) );
 }
 
 sub encrypt {
@@ -87,9 +87,9 @@ sub decrypt {
 }
 
 sub _encode {
-    my ( $self, $num, $alphabet, $salt, $minHashLength ) = @_;
+    my ( $self, $num, $chars, $salt, $minHashLength ) = @_;
 
-    $alphabet      ||= $self->alphabet;
+    $chars         ||= $self->chars;
     $salt          ||= $self->salt;
     $minHashLength ||= $self->minHashLength;
 
@@ -107,16 +107,16 @@ sub _encode {
             }
 
             my @lottery = split //,
-                $self->_consistentShuffle( $alphabet, $lotterySalt );
+                $self->_consistentShuffle( $chars, $lotterySalt );
             $res .= $lotteryChar = $lottery[0];
 
-            $alphabet =~ s/$lotteryChar//g;
-            $alphabet = $lotteryChar . $alphabet;
+            $chars =~ s/$lotteryChar//g;
+            $chars = $lotteryChar . $chars;
         }
 
-        $alphabet = $self->_consistentShuffle( $alphabet,
+        $chars = $self->_consistentShuffle( $chars,
             ( ord($lotteryChar) & 12345 ) . $salt );
-        $res .= $self->_hash( $number, $alphabet );
+        $res .= $self->_hash( $number, $chars );
 
         if ( ( $i + 1 ) < @$num ) {
             my $index = ( $number + $i ) % @seps;
@@ -144,10 +144,10 @@ sub _encode {
     }
 
     while ( length($res) < $minHashLength ) {
-        my @alphabet = split //, $alphabet;
-        my @pad = ( ord( $alphabet[1] ), ord( $alphabet[0] ) );
-        my $padLeft = $self->_encode( \@pad, $alphabet, $salt );
-        my $padRight = $self->_encode( \@pad, $alphabet, join( '', @pad ) );
+        my @chars = split //, $chars;
+        my @pad = ( ord( $chars[1] ), ord( $chars[0] ) );
+        my $padLeft = $self->_encode( \@pad, $chars, $salt );
+        my $padRight = $self->_encode( \@pad, $chars, join( '', @pad ) );
 
         $res = join '', $padLeft, $res, $padRight;
         my $excess = length($res) - $minHashLength;
@@ -156,8 +156,7 @@ sub _encode {
             $res = substr( $res, $excess / 2, $minHashLength );
         }
 
-        $alphabet
-            = $self->_consistentShuffle( $alphabet, join( '', $salt, $res ) );
+        $chars = $self->_consistentShuffle( $chars, join( '', $salt, $res ) );
     }
 
     $res;
@@ -171,7 +170,7 @@ sub _decode {
     my $res = [];
 
     my $orig        = $hash;
-    my $alphabet    = '';
+    my $chars       = '';
     my $lotteryChar = '';
 
     my $guards = $self->guards;
@@ -200,15 +199,15 @@ sub _decode {
             unless ($i) {
                 $lotteryChar = substr( $hash, 0, 1 );
                 $subHash = substr( $subHash, 1 );
-                my $sa = $self->alphabet;
+                my $sa = $self->chars;
                 $sa =~ s/$lotteryChar//;
-                $alphabet = $lotteryChar . $sa;
+                $chars = $lotteryChar . $sa;
             }
 
-            if ( $alphabet and $lotteryChar ) {
-                $alphabet = $self->_consistentShuffle( $alphabet,
+            if ( $chars and $lotteryChar ) {
+                $chars = $self->_consistentShuffle( $chars,
                     ( ord($lotteryChar) & 12345 ) . $self->salt );
-                push @$res, $self->_unhash( $subHash, $alphabet );
+                push @$res, $self->_unhash( $subHash, $chars );
             }
         }
     }
