@@ -36,7 +36,13 @@ sub BUILDARGS {
 sub BUILD {
     my $self = shift;
 
-    my @alphabet = split //, $self->alphabet;
+    my $alphabet = $self->alphabet;
+    my @alphabet = split //, $alphabet;
+    my $seps     = [];
+    my $guards   = [];
+
+    my @primes = ( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43 );
+    my @indices = ( 0, 4, 8, 12 );
 
     die "@alphabet must contain at least 4 characters"
         unless @alphabet >= 4;
@@ -46,40 +52,21 @@ sub BUILD {
             if scalar grep { $u{$_}++ } @alphabet;
     }
 
-    # probably in _build_seps
-    my @primes = ( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43 );
     for my $prime (@primes) {
         if ( my $ch = $alphabet[ $prime - 1 ] ) {
-            my $seps = $self->seps;
             push @$seps, $ch;
-            $self->_set_seps($seps);
-
-            # inefficient, I think...
-            my $alphabet = $self->alphabet;
-            $alphabet =~ s/$ch/ /g;
-            $self->_set_alphabet($alphabet);
+            $alphabet =~ s/$ch//g;
         }
     }
-
-    # this too, in _build_guards
-    my @sepIndices = ( 0, 4, 8, 12 );
-    for my $index (@sepIndices) {
-        my $seps = $self->seps;
+    for my $index (@indices) {
         if ( my $sep = $seps->[$index] ) {
-            my $guards = $self->guards;
             push @$guards, $sep;
-            $self->_set_guards($guards);
-
-            # ewww
-            my $s = $self->seps;
-            splice @$s, $index, 1;
-            $self->_set_seps($s);
+            splice @$seps, $index, 1;
         }
     }
 
-    # another inefficiency
-    my $alphabet = $self->alphabet;
-    $alphabet =~ s/\s//g;
+    $self->_set_guards($guards);
+    $self->_set_seps($seps);
     $self->_set_alphabet(
         $self->_consistentShuffle( $alphabet, $self->salt ) );
 }
