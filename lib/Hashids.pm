@@ -218,6 +218,8 @@ sub _consistentShuffle {
 
     my $res = '';
 
+    return $res unless $alphabet;
+
     if ( ref $alphabet eq 'ARRAY' ) {
         $alphabet = join '', @$alphabet;
     }
@@ -225,36 +227,33 @@ sub _consistentShuffle {
         $salt = join '', @$salt;
     }
 
-    if ($alphabet) {
-        my @alphabet = split //, $alphabet;
-        my @salt     = split //, $salt;
-        my @sort;
+    my @alphabet = split //, $alphabet;
+    my @salt     = split //, $salt;
+    my @sort;
 
-        push @salt, '' unless @salt;
+    push @salt, '' unless @salt;
+    push @sort, ( ord || 0 ) for @salt;
 
-        push @sort, ( ord || 0 ) for @salt;
-
-        for ( my $i = 0; $i != @sort; $i++ ) {
-            my $add = 1;
-            for ( my $k = $i; $k != @sort + $i - 1; $k++ ) {
-                my $next = ( $k + 1 ) % @sort;
-                ($add)
-                    ? ( $sort[$i] += $sort[$next] + ( $k * $i ) )
-                    : ( $sort[$i] -= $sort[$next] );
-                $add = !$add;
-            }
-            $sort[$i] = abs $sort[$i];
+    for ( my $i = 0; $i != @sort; $i++ ) {
+        my $add = 1;
+        for ( my $j = $i; $j != @sort + $i - 1; $j++ ) {
+            my $next = ( $j + 1 ) % @sort;
+            ($add)
+                ? ( $sort[$i] += $sort[$next] + ( $j * $i ) )
+                : ( $sort[$i] -= $sort[$next] );
+            $add = !$add;
         }
+        $sort[$i] = abs $sort[$i];
+    }
 
-        my $i = 0;
-        while (@alphabet) {
-            my $pos = $sort[$i];
-            $pos %= @alphabet if $pos >= @alphabet;
-            $res .= $alphabet[$pos];
-            splice @alphabet, $pos, 1;
+    my $k = 0;
+    while (@alphabet) {
+        my $pos = $sort[$k];
+        $pos %= @alphabet if $pos >= @alphabet;
+        $res .= $alphabet[$pos];
+        splice @alphabet, $pos, 1;
 
-            $i = ++$i % @sort;
-        }
+        $k = ++$k % @sort;
     }
 
     $res;
