@@ -4,6 +4,7 @@ use warnings;
 
 our $VERSION = "0.05";
 
+use Carp;
 use Moo;
 use Scalar::Util 'looks_like_number';
 use List::MoreUtils 'firstidx';
@@ -43,13 +44,13 @@ sub BUILD {
     my @primes = ( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43 );
     my @indices = ( 0, 4, 8, 12 );
 
-    die "@alphabet must not have spaces"
+    croak "@alphabet must not have spaces"
         if $alphabet =~ /\s/;
-    die "@alphabet must contain at least 4 characters"
+    croak "@alphabet must contain at least 4 characters"
         unless @alphabet >= 4;
     {
         my %u;
-        die "@alphabet must contain unique characters"
+        croak "@alphabet must contain unique characters"
             if scalar grep { $u{$_}++ } @alphabet;
     }
 
