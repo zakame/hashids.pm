@@ -143,7 +143,7 @@ sub _encode {
     }
 
     while ( length($res) < $minHashLength ) {
-        my @pad = map ord reverse split // => $chars, 2;
+        my @pad = map { ord } reverse split // => $chars, 2;
         my $padLeft  = $self->_encode( \@pad, $chars, $salt );
         my $padRight = $self->_encode( \@pad, $chars, "@pad" );
 
