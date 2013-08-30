@@ -6,14 +6,12 @@ our $VERSION = "0.05";
 
 use Carp;
 use Moo;
-use Scalar::Util 'looks_like_number';
-use List::MoreUtils 'firstidx';
 
 has salt => ( is => 'ro', default => '' );
 has minHashLength => (
     is  => 'ro',
     isa => sub {
-        die "$_[0] is not a number!" unless looks_like_number $_[0];
+        die "$_[0] is not a number!" unless $_[0] =~ /^\d+$/;
     },
     default => 0
 );
@@ -76,7 +74,7 @@ sub encrypt {
     my ( $self, @num ) = @_;
 
     return '' unless @num;
-    map { return '' unless looks_like_number $_ and /^\d+$/ } @num;
+    map { return '' unless /^\d+$/ } @num;
 
     $self->_encode( \@num );
 }
@@ -266,8 +264,8 @@ sub _hash {
     my @alphabet = split //, $alphabet;
 
     do {
-        $hash = join '', $alphabet[ $num % @alphabet ], $hash;
-        $num = int( $num / @alphabet );
+        $hash = $alphabet[ $num % @alphabet ] . $hash;
+        $num  = int( $num / @alphabet );
     } while ($num);
 
     $hash;
@@ -281,7 +279,7 @@ sub _unhash {
 
     my @hash = split //, $hash;
     for ( my $i = 0; $i < @hash; $i++ ) {
-        $pos = firstidx { $_ eq $hash[$i] } split //, $alphabet;
+        $pos = index $alphabet, $hash[$i];
         $num += $pos * ( length($alphabet)**( @hash - $i - 1 ) );
     }
 
