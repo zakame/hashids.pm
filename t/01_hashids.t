@@ -6,7 +6,7 @@ use Test::More;
 use Test::Exception;
 use Hashids;
 
-plan tests => 4;
+plan tests => 5;
 
 my $salt = "this is my salt";
 
@@ -140,4 +140,15 @@ subtest 'list encrypt/decrypt' => sub {
         my @result = $hashids->decrypt($encrypted);
         is_deeply( \@result, \@plaintexts, 'decrypted as list (multi)' );
     };
+};
+
+subtest 'work with counting numbers only' => sub {
+    my $hashids = Hashids->new();
+
+    plan tests => 4;
+
+    is( $hashids->encrypt(12.3), '', 'not an integer' );
+    is( $hashids->encrypt(-1),   '', 'not a positive integer' );
+    is( $hashids->encrypt( 123, 45.6 ), '', 'no integer in list' );
+    is( $hashids->encrypt( -1, -2, 3 ), '', 'negative integers in list' );
 };

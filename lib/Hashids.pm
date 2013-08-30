@@ -76,7 +76,7 @@ sub encrypt {
     my ( $self, @num ) = @_;
 
     return '' unless @num;
-    map { return '' unless looks_like_number $_ } @num;
+    map { return '' unless looks_like_number $_ and /^\d+$/ } @num;
 
     $self->_encode( \@num );
 }
