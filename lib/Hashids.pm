@@ -107,9 +107,9 @@ sub _encode {
                 $lotterySalt .= '-' . ( $num->[$j] + 1 ) * 2;
             }
 
-            my @lottery = split //,
-                $self->_consistentShuffle( $chars, $lotterySalt );
-            $res .= $lotteryChar = $lottery[0];
+            ( $lotteryChar, undef ) = split //,
+                $self->_consistentShuffle( $chars, $lotterySalt ), 2;
+            $res .= $lotteryChar;
 
             $chars =~ s/$lotteryChar//g;
             $chars = $lotteryChar . $chars;
@@ -135,7 +135,7 @@ sub _encode {
         my $guardIndex = $firstIndex % @$guards;
         my $guard      = $guards->[$guardIndex];
 
-        $res = join '', $guard, $res;
+        $res = $guard . $res;
         if ( length($res) < $minHashLength ) {
             $guardIndex = ( $guardIndex + length($res) ) % @$guards;
             $guard      = $guards->[$guardIndex];
@@ -145,19 +145,18 @@ sub _encode {
     }
 
     while ( length($res) < $minHashLength ) {
-        my @chars = split //, $chars;
-        my @pad = ( ord( $chars[1] ), ord( $chars[0] ) );
-        my $padLeft = $self->_encode( \@pad, $chars, $salt );
-        my $padRight = $self->_encode( \@pad, $chars, join( '', @pad ) );
+        my @pad = map ord reverse split // => $chars, 2;
+        my $padLeft  = $self->_encode( \@pad, $chars, $salt );
+        my $padRight = $self->_encode( \@pad, $chars, "@pad" );
 
-        $res = join '', $padLeft, $res, $padRight;
+        $res = $padLeft . $res . $padRight;
         my $excess = length($res) - $minHashLength;
 
         if ( $excess > 0 ) {
             $res = substr( $res, $excess / 2, $minHashLength );
         }
 
-        $chars = $self->_consistentShuffle( $chars, join( '', $salt, $res ) );
+        $chars = $self->_consistentShuffle( $chars, $salt . $res );
     }
 
     $res;
