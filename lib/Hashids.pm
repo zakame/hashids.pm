@@ -1,6 +1,4 @@
 package Hashids;
-use strict;
-use warnings;
 
 our $VERSION = "0.07";
 
@@ -142,7 +140,7 @@ sub _encode {
     }
 
     while ( length($res) < $minHashLength ) {
-        my @pad = map { ord } reverse split // => $chars, 2;
+        my @pad = map {ord} reverse split // => $chars, 2;
         my $padLeft  = $self->_encode( \@pad, $chars, $salt );
         my $padRight = $self->_encode( \@pad, $chars, "@pad" );
 
@@ -417,4 +415,3 @@ Props to L<Jofell Gallardo|http://twitter.com/jofell> for pointing this
 excellent project to me in the first place.
 
 =cut
-
