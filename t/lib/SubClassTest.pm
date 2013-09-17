@@ -1,13 +1,16 @@
-package SubClassTest;
-use Moo;
-extends 'Hashids';
+use mop;
 
-has extra_number => ( is => 'ro', required => 1 );
-has '+salt' => ( default => sub {'I want peppers'} );
+class SubClassTest extends Hashids {
+    has $!extra_number is ro = die "'$!extra_number' is required";
 
-around encrypt => sub {
-    my ( $orig, $self, @args ) = @_;
-    $self->$orig( $self->extra_number, @args );
-};
+    method new {
+        $class->next::method( salt => 'I want peppers', @_ );
+    }
+
+    method encrypt (@args) {
+        unshift @args, $!extra_number;
+        $self->next::method(@args);
+    }
+}
 
 1;
