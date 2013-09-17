@@ -1,9 +1,10 @@
 language: perl
 before_install:
-  - perlbrew install-cpanm
   - cpanm --dev twigils
 install:
-  - cpanm https://github.com/stevan/p5-mop-redux.git
+  - git clone https://github.com/stevan/p5-mop-redux.git
+  - cd p5-mop-redux
+  - cpanm .
 perl:
   - 5.16
   - 5.18
