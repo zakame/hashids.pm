@@ -57,7 +57,6 @@ class Hashids {
     method encrypt (@num) {
         return '' unless @num;
         map { return '' unless /^\d+$/ } @num;
-    
         $self->_encode( \@num );
     }
 
@@ -70,84 +69,84 @@ class Hashids {
         $chars         ||= $!chars;
         $salt          ||= $!salt;
         $minHashLength ||= $!minHashLength;
-    
+
         my $res = '';
         my @seps = split //, $self->_consistentShuffle( $!seps, $num );
         my $lotteryChar = '';
-    
+
         for ( my $i = 0; $i != @$num; $i++ ) {
             my $number = $num->[$i];
-    
+
             unless ($i) {
                 my $lotterySalt = join '-', @$num;
                 for ( my $j = 0; $j != @$num; $j++ ) {
                     $lotterySalt .= '-' . ( $num->[$j] + 1 ) * 2;
                 }
-    
+
                 ( $lotteryChar, undef ) = split //,
                     $self->_consistentShuffle( $chars, $lotterySalt ), 2;
                 $res .= $lotteryChar;
-    
+
                 $chars =~ s/$lotteryChar//g;
                 $chars = $lotteryChar . $chars;
             }
-    
+
             $chars = $self->_consistentShuffle( $chars,
                 ( ord($lotteryChar) & 12345 ) . $salt );
             $res .= $self->_hash( $number, $chars );
-    
+
             if ( ( $i + 1 ) < @$num ) {
                 my $index = ( $number + $i ) % @seps;
                 $res .= $seps[$index];
             }
         }
-    
+
         if ( length($res) < $minHashLength ) {
             my $firstIndex = 0;
             for ( my $i = 0; $i != @$num; $i++ ) {
                 $firstIndex += ( $i + 1 ) * $num->[$i];
             }
-    
+
             my $guardIndex = $firstIndex % $!guards;
             my $guard      = $!guards->[$guardIndex];
-    
+
             $res = $guard . $res;
             if ( length($res) < $minHashLength ) {
                 $guardIndex = ( $guardIndex + length($res) ) % $!guards;
                 $guard      = $!guards->[$guardIndex];
-    
+
                 $res .= $guard;
             }
         }
-    
+
         while ( length($res) < $minHashLength ) {
-            my @pad = map { ord } reverse split // => $chars, 2;
+            my @pad = map {ord} reverse split // => $chars, 2;
             my $padLeft  = $self->_encode( \@pad, $chars, $salt );
             my $padRight = $self->_encode( \@pad, $chars, "@pad" );
-    
+
             $res = $padLeft . $res . $padRight;
             my $excess = length($res) - $minHashLength;
-    
+
             if ( $excess > 0 ) {
                 $res = substr( $res, $excess / 2, $minHashLength );
             }
-    
+
             $chars = $self->_consistentShuffle( $chars, $salt . $res );
         }
-    
+
         $res;
     }
 
     method _decode ($hash) {
         return unless $hash;
         return unless defined wantarray;
-    
+
         my $res = [];
-    
+
         my $orig        = $hash;
         my $lotteryChar = '';
         my $splitIndex  = 0;
-    
+
         my $chars  = $!chars;
         my $guards = $!guards;
         my $seps   = $!seps;
@@ -163,7 +162,7 @@ class Hashids {
         for my $sep (@$seps) {
             $hash =~ s/$sep/ /g;
         }
-    
+
         my @subHash = split / /, $hash;
         for ( my $i = 0; $i != @subHash; $i++ ) {
             if ( my $subHash = $subHash[$i] ) {
@@ -173,7 +172,7 @@ class Hashids {
                     $chars =~ s/$lotteryChar//;
                     $chars = $lotteryChar . $chars;
                 }
-    
+
                 if ( $chars and $lotteryChar ) {
                     $chars = $self->_consistentShuffle( $chars,
                         ( ord($lotteryChar) & 12345 ) . $!salt );
@@ -181,34 +180,34 @@ class Hashids {
                 }
             }
         }
-    
+
         #return unless $self->Hashids::encrypt(@$res) eq $orig;
         return
             unless mop::get_meta('Hashids')->get_method('encrypt')
             ->execute( $self, $res ) eq $orig;
-    
+
         wantarray ? @$res : @$res == 1 ? $res->[0] : $res;
     }
 
     method _consistentShuffle ( $alphabet, $salt ) {
         my $res = '';
-    
+
         return $res unless $alphabet;
-    
+
         if ( ref $alphabet eq 'ARRAY' ) {
             $alphabet = join '', @$alphabet;
         }
         if ( ref $salt eq 'ARRAY' ) {
             $salt = join '', @$salt;
         }
-    
+
         my @alphabet = split //, $alphabet;
         my @salt     = split //, $salt;
         my @sort;
-    
+
         push @salt, '' unless @salt;
         push @sort, ( ord || 0 ) for @salt;
-    
+
         for ( my $i = 0; $i != @sort; $i++ ) {
             my $add = 1;
             for ( my $j = $i; $j != @sort + $i - 1; $j++ ) {
@@ -220,42 +219,42 @@ class Hashids {
             }
             $sort[$i] = abs $sort[$i];
         }
-    
+
         my $k = 0;
         while (@alphabet) {
             my $pos = $sort[$k];
             $pos %= @alphabet if $pos >= @alphabet;
             $res .= $alphabet[$pos];
             splice @alphabet, $pos, 1;
-    
+
             $k = ++$k % @sort;
         }
-    
+
         $res;
     }
 
     method _hash ( $num, $alphabet ) {
         my $hash = '';
         my @alphabet = split //, $alphabet;
-    
+
         do {
             $hash = $alphabet[ $num % @alphabet ] . $hash;
             $num  = int( $num / @alphabet );
         } while ($num);
-    
+
         $hash;
     }
 
     method _unhash ( $hash, $alphabet ) {
         my $num = 0;
         my $pos;
-    
+
         my @hash = split //, $hash;
         for ( my $i = 0; $i < @hash; $i++ ) {
             $pos = index $alphabet, $hash[$i];
             $num += $pos * ( length($alphabet)**( @hash - $i - 1 ) );
         }
-    
+
         $num;
     }
 }
