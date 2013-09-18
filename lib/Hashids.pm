@@ -1,3 +1,4 @@
+package main;
 use strict;
 use warnings;
 use Carp;
