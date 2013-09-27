@@ -15,7 +15,7 @@ class Hashids {
     has $!seps is ro   = [];
     has $!guards is ro = [];
 
-    method new {
+    method new ($class:) {
         unshift @_, 'salt' if @_ %2 == 1;
         $class->next::method(@_);
     }
