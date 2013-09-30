@@ -22,7 +22,7 @@ has alphabet => (
             unless length $_[0] >= 4;
         my %u;
         croak "$_[0] must contain unique characters"
-            if scalar grep { $u{$_}++ } split // => $_[0];
+            if grep { $u{$_}++ } split // => $_[0];
     },
     default => 'xcS4F6h89aUbideAI7tkynuopqrXCgTE5GBKHLMjfRsz'
 );
