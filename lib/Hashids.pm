@@ -184,7 +184,7 @@ class Hashids {
 
         #return unless $self->Hashids::encrypt(@$res) eq $orig;
         return
-            unless mop::get_meta('Hashids')->get_method('encrypt')
+            unless mop::meta('Hashids')->get_method('encrypt')
             ->execute( $self, $res ) eq $orig;
 
         wantarray ? @$res : @$res == 1 ? $res->[0] : $res;
