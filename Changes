@@ -2,6 +2,12 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+0.08 2013-10-20T10:58:30Z
+
+    - Check intial arguments sooner
+    - Adjust travis build (use Perl 5.14 to 5.18)
+    - Add Travisa badge in README
+
 0.07 2013-08-30T11:42:51Z
 
     - Fix 'map ord reverse split...' for perls < 5.18
