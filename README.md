@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/zakame/hashids.pm.png?branch=master)](https://travis-ci.org/zakame/hashids.pm)
 # NAME
 
 Hashids - generate short hashes from numbers
