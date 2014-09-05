@@ -45,21 +45,21 @@ subtest 'basics' => sub {
         plan tests => 5;
 
         is( $hashids->alphabet,
-            'xcS4F6h89aUbideAI7tkynuopqrXCgTE5GBKHLMjfRsz',
+            'gjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890',
             'default alphabet'
         );
 
         my $alphabet = join '' => ( 'a' .. 'z' );
         $hashids = Hashids->new( alphabet => $alphabet );
-        is( $hashids->alphabet, $alphabet, 'custom alphabet' );
+        is( $hashids->alphabet, 'degjklmnopqrvwxyz', 'custom alphabet' );
 
         $alphabet = "abc";
         throws_ok {
             Hashids->new( alphabet => $alphabet );
         }
-        qr/must contain at least 4/, 'at least 4 chars';
+        qr/must contain at least 16/, 'at least 16 chars';
 
-        $alphabet = "abca";
+        $alphabet = "gjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890g";
         throws_ok {
             Hashids->new( alphabet => $alphabet );
         }
@@ -74,9 +74,8 @@ subtest 'basics' => sub {
     };
 
     subtest 'chars, seps, and guards' => sub {
-        plan tests => 3;
+        plan tests => 2;
 
-        ok( $hashids->chars,  'has chars' );
         ok( $hashids->seps,   'has seps' );
         ok( $hashids->guards, 'has guards' );
     };
@@ -87,7 +86,7 @@ subtest 'internal functions' => sub {
 
     is( Hashids->_consistentShuffle( '123', 'salt' ), '231', 'shuffle 1' );
     is( Hashids->_consistentShuffle( 'abcdefghij', 'salt' ),
-        'aichgfdebj', 'shuffle 2' );
+        'iajecbhdgf', 'shuffle 2' );
 
     is( Hashids->_hash( 123, 'abcdefghij' ), 'bcd', 'internal hash' );
     is( Hashids->_unhash( 'bcd', 'abcdefghij' ), 123, 'internal unhash' );
@@ -102,12 +101,12 @@ subtest 'simple encrypt/decrypt' => sub {
     is( $hashids->encrypt('up the wazoo'), '', 'bad encrypt' );
 
     my $plaintext = 123;
-    my $encrypted = 'a79';
+    my $encrypted = 'YDx';
     is( $hashids->encrypt($plaintext), $encrypted, 'encrypt 1' );
     is( $hashids->decrypt($encrypted), $plaintext, 'decrypt 1' );
 
     $plaintext = 123456;
-    $encrypted = 'AMyLz';
+    $encrypted = '4DLz6';
     is( $hashids->encrypt($plaintext), $encrypted, 'encrypt 2' );
     is( $hashids->decrypt($encrypted), $plaintext, 'decrypt 2' );
 };
@@ -120,13 +119,13 @@ subtest 'list encrypt/decrypt' => sub {
     can_ok( $hashids, qw/encrypt decrypt/ );
 
     my @plaintexts = ( 1, 2, 3 );
-    my $encrypted = 'eGtrS8';
+    my $encrypted = 'laHquq';
     is( $hashids->encrypt(@plaintexts), $encrypted, 'encrypt list 1' );
     is_deeply( scalar $hashids->decrypt($encrypted),
         \@plaintexts, 'decrypt list 1' );
 
     @plaintexts = ( 123, 456, 789 );
-    $encrypted = 'yn8t46hen';
+    $encrypted = 'Z8gi1DIx6';
     is( $hashids->encrypt(@plaintexts), $encrypted, 'encrypt list 2' );
     is_deeply( scalar $hashids->decrypt($encrypted),
         \@plaintexts, 'decrypt list 2' );
@@ -134,7 +133,7 @@ subtest 'list encrypt/decrypt' => sub {
     subtest 'decrypted return as list' => sub {
         plan tests => 2;
 
-        my @single = $hashids->decrypt('a79');
+        my @single = $hashids->decrypt('YDx');
         is_deeply( \@single, [123], 'decrypted as list (single value)' );
 
         my @result = $hashids->decrypt($encrypted);

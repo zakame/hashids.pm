@@ -16,7 +16,7 @@ isa_ok( $subclass, 'SubClassTest' );
 isa_ok( $subclass, 'Hashids' );
 
 my $plaintext = 456;
-my $encrypted = 'GoBu7d';
+my $encrypted = 'MlpTgL';
 
 is( $subclass->encrypt($plaintext), $encrypted, 'subclass encrypted' );
 is_deeply(
