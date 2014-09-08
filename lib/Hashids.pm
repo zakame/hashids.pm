@@ -52,10 +52,10 @@ sub BUILD {
     # alphabet should not contain seps
     for my $sep ( split //, $self->seps ) {
         push @seps, $sep if grep {/$sep/} @alphabet;
-        @alphabet = grep {!/$sep/} @alphabet;
+        @alphabet = grep { !/$sep/ } @alphabet;
     }
 
-    @seps = split // => $self->_consistentShuffle( \@seps, $self->salt );
+    @seps = $self->_consistentShuffle( \@seps, $self->salt );
 
     if ( !@seps || ( @alphabet / @seps ) > $sepDiv ) {
         my $sepsLength = POSIX::ceil( @alphabet / $sepDiv );
@@ -71,8 +71,7 @@ sub BUILD {
         }
     }
 
-    @alphabet
-        = split // => $self->_consistentShuffle( \@alphabet, $self->salt );
+    @alphabet = $self->_consistentShuffle( \@alphabet, $self->salt );
     my $guardCount = POSIX::ceil( @alphabet / $guardDiv );
 
     if ( @alphabet < 3 ) {
@@ -120,8 +119,8 @@ sub _encode {
         my $n = $num->[$i];
         my $b = join '' => $lottery, $self->salt, @alphabet;
 
-        @alphabet = split // =>
-            $self->_consistentShuffle( \@alphabet, substr $b, 0, @alphabet );
+        @alphabet = $self->_consistentShuffle( \@alphabet, substr $b, 0,
+            @alphabet );
         my $last = $self->_hash( $n, join '' => @alphabet );
 
         $res = join '' => $res, $last;
@@ -214,18 +213,12 @@ sub _decode {
 sub _consistentShuffle {
     my ( $self, $alphabet, $salt ) = @_;
 
-    return '' unless $alphabet;
+    return wantarray ? [''] : '' unless $alphabet;
 
-    if ( ref $alphabet eq 'ARRAY' ) {
-        $alphabet = join '', @$alphabet;
-    }
-    return $alphabet unless $salt;
-    if ( ref $salt eq 'ARRAY' ) {
-        $salt = join '', @$salt;
-    }
-
-    my @alphabet = split //, $alphabet;
-    my @salt     = split //, $salt;
+    my @alphabet
+        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
+    return wantarray ? @alphabet : join '', @alphabet unless $salt;
+    my @salt = ref $salt eq 'ARRAY' ? @$salt : split // => $salt;
 
     my ( $int, $temp, $j );
     for ( my ( $i, $v, $p ) = ( $#alphabet, 0, 0 ); $i > 0; $i--, $v++ ) {
@@ -233,12 +226,10 @@ sub _consistentShuffle {
         $p += $int = ord $salt[$v];
         $j = ( $int + $v + $p ) % $i;
 
-        $temp         = $alphabet[$j];
-        $alphabet[$j] = $alphabet[$i];
-        $alphabet[$i] = $temp;
+        @alphabet[ $j, $i ] = @alphabet[ $i, $j ];
     }
 
-    join '', @alphabet;
+    wantarray ? @alphabet : join '', @alphabet;
 }
 
 sub _hash {

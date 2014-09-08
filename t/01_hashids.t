@@ -82,11 +82,22 @@ subtest 'basics' => sub {
 };
 
 subtest 'internal functions' => sub {
-    plan tests => 4;
+    plan tests => 8;
 
     is( Hashids->_consistentShuffle( '123', 'salt' ), '231', 'shuffle 1' );
     is( Hashids->_consistentShuffle( 'abcdefghij', 'salt' ),
         'iajecbhdgf', 'shuffle 2' );
+
+    is( Hashids->_consistentShuffle( [ '1', '2', '3' ], 'salt' ),
+        '231', 'shuffle alphabet list 1' );
+    is( Hashids->_consistentShuffle( [ 'a' .. 'j' ], 'salt' ),
+        'iajecbhdgf', 'shuffle alphabet list 2' );
+
+    my @res = Hashids->_consistentShuffle( '123', 'salt' );
+    is_deeply( \@res, [qw( 2 3 1 )], 'shuffle returns a list' );
+
+    is( Hashids->_consistentShuffle( [ 'a' .. 'j' ], [qw( s a l t )] ),
+        'iajecbhdgf', 'shuffle with salt as list' );
 
     is( Hashids->_hash( 123, 'abcdefghij' ), 'bcd', 'internal hash' );
     is( Hashids->_unhash( 'bcd', 'abcdefghij' ), 123, 'internal unhash' );
