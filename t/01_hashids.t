@@ -82,7 +82,7 @@ subtest 'basics' => sub {
 };
 
 subtest 'internal functions' => sub {
-    plan tests => 8;
+    plan tests => 9;
 
     is( Hashids->_consistentShuffle( '123', 'salt' ), '231', 'shuffle 1' );
     is( Hashids->_consistentShuffle( 'abcdefghij', 'salt' ),
@@ -101,6 +101,14 @@ subtest 'internal functions' => sub {
 
     is( Hashids->_hash( 123, 'abcdefghij' ), 'bcd', 'internal hash' );
     is( Hashids->_unhash( 'bcd', 'abcdefghij' ), 123, 'internal unhash' );
+
+    subtest '_hash/_unhash with list' => sub {
+        plan tests => 2;
+
+        my @alphabet = qw(a b c d e f g h i j);
+        is( Hashids->_hash( 123, \@alphabet ), 'bcd', 'internal hash' );
+        is( Hashids->_unhash( 'bcd', \@alphabet ), 123, 'internal unhash' );
+    };
 };
 
 subtest 'simple encrypt/decrypt' => sub {

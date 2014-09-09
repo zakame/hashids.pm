@@ -49,7 +49,7 @@ sub BUILDARGS {
 sub BUILD {
     my $self = shift;
 
-    my @alphabet = split //, $self->alphabet;
+    my @alphabet = split // => $self->alphabet;
     my ( @seps, @guards );
 
     my $sepDiv   = 3.5;
@@ -117,13 +117,13 @@ sub _encode {
     my $lottery = $res[0] = $alphabet[ $numHashInt % @alphabet ];
     for ( $i = 0; $i != @$num; $i++ ) {
         my $n = $num->[$i];
-        my @s = ( $lottery, split( //, $self->salt ), @alphabet )
+        my @s = ( $lottery, split( // => $self->salt ), @alphabet )
             [ 0 .. @alphabet ];
 
         @alphabet = $self->_consistentShuffle( \@alphabet, \@s );
-        my $last = $self->_hash( $n, join '' => @alphabet );
+        my $last = $self->_hash( $n, \@alphabet );
 
-        push @res, split // => $last;
+        push @res => split // => $last;
 
         if ( $i + 1 < @$num ) {
             my $seps = $self->seps;
@@ -156,8 +156,7 @@ sub _encode {
             @res, @alphabet[ 0 .. $halfLength - 1 ]
         );
 
-        my $excess = @res - $self->minHashLength;
-        if ( $excess > 0 ) {
+        if ( ( my $excess = @res - $self->minHashLength ) > 0 ) {
             @res = splice @res, int $excess / 2, $self->minHashLength;
         }
     }
@@ -174,32 +173,24 @@ sub _decode {
     my $res  = [];
     my $orig = $hash;
 
-    for my $guard ( @{ $self->guards } ) {
-        $hash =~ s/$guard/ /;
-    }
-    my @hash = split / / => $hash;
-
-    my $i = 0;
-    if ( @hash == 3 || @hash == 2 ) {
-        $i = 1;
-    }
+    my $guard = join '|', @{ $self->guards };
+    my @hash = grep { !/^$/ } split /$guard/ => $hash;
+    my $i = ( @hash == 3 || @hash == 2 ) ? 1 : 0;
 
     $hash = $hash[$i];
     if ( my $lottery = substr $hash, 0, 1 ) {
         $hash = substr $hash, 1;
 
-        for my $sep ( @{ $self->seps } ) {
-            $hash =~ s/$sep/ /;
-        }
-        @hash = split / / => $hash;
+        my $sep = join '|', @{ $self->seps };
+        @hash = grep { !/^$/ } split /$sep/ => $hash;
 
-        my $alphabet = $self->alphabet;
+        my @alphabet = split // => $self->alphabet;
         for my $part (@hash) {
-            my $b = join '' => $lottery, $self->salt, $alphabet;
+            my @s = ( $lottery, split( // => $self->salt ), @alphabet )
+                [ 0 .. @alphabet ];
 
-            $alphabet = $self->_consistentShuffle( $alphabet, substr $b, 0,
-                length $alphabet );
-            push @$res, $self->_unhash( $part, $alphabet );
+            @alphabet = $self->_consistentShuffle( \@alphabet, \@s );
+            push @$res => $self->_unhash( $part, \@alphabet );
         }
     }
 
@@ -216,7 +207,7 @@ sub _consistentShuffle {
     my @alphabet
         = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
     return wantarray ? @alphabet : join '', @alphabet unless $salt;
-    my @salt = ref $salt eq 'ARRAY' ? @$salt : split // => $salt;
+    my @salt = ref $salt eq 'ARRAY' ? @$salt : split //, $salt;
 
     my ( $int, $temp, $j );
     for ( my ( $i, $v, $p ) = ( $#alphabet, 0, 0 ); $i > 0; $i--, $v++ ) {
@@ -234,7 +225,8 @@ sub _hash {
     my ( $self, $num, $alphabet ) = @_;
 
     my $hash = '';
-    my @alphabet = split //, $alphabet;
+    my @alphabet
+        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
 
     do {
         $hash = $alphabet[ $num % @alphabet ] . $hash;
@@ -246,6 +238,8 @@ sub _hash {
 
 sub _unhash {
     my ( $self, $hash, $alphabet ) = @_;
+
+    $alphabet = join '' => @$alphabet if ref $alphabet eq 'ARRAY';
 
     my $num = 0;
     my $pos;
