@@ -25,10 +25,10 @@ has alphabet => (
         croak "$_[0] must contain unique characters"
             if grep { $u{$_}++ } split // => $_[0];
     },
-    default =>
-        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    default => sub { join '' => ( 'a' .. 'z', 'A' .. 'Z', 1 .. 9, 0 ) }
 );
 
+has chars => ( is => 'rwp', init_arg => undef, default => sub { [] } );
 has seps => (
     is       => 'rwp',
     init_arg => undef,
@@ -83,7 +83,7 @@ sub BUILD {
         ? splice @seps, 0, $guardCount
         : splice @alphabet, 0, $guardCount;
 
-    $self->_set_alphabet( join '', @alphabet );
+    $self->_set_chars( \@alphabet );
     $self->_set_seps( \@seps );
     $self->_set_guards( \@guards );
 }
@@ -106,7 +106,7 @@ sub decrypt {
 sub _encode {
     my ( $self, $num ) = @_;
 
-    my @alphabet = split // => $self->alphabet;
+    my @alphabet = @{ $self->chars };
     my @res;
 
     my ( $i, $numHashInt, $sepsIndex );
@@ -184,7 +184,7 @@ sub _decode {
         my $sep = join '|', @{ $self->seps };
         @hash = grep { !/^$/ } split /$sep/ => $hash;
 
-        my @alphabet = split // => $self->alphabet;
+        my @alphabet = @{ $self->chars };
         for my $part (@hash) {
             my @s = ( $lottery, split( // => $self->salt ), @alphabet )
                 [ 0 .. @alphabet ];

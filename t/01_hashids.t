@@ -45,13 +45,13 @@ subtest 'basics' => sub {
         plan tests => 5;
 
         is( $hashids->alphabet,
-            'gjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890',
+            join( '' => ( 'a' .. 'z', 'A' .. 'Z', 1 .. 9, 0 ) ),
             'default alphabet'
         );
 
         my $alphabet = join '' => ( 'a' .. 'z' );
         $hashids = Hashids->new( alphabet => $alphabet );
-        is( $hashids->alphabet, 'degjklmnopqrvwxyz', 'custom alphabet' );
+        is( $hashids->alphabet, $alphabet, 'custom alphabet' );
 
         $alphabet = "abc";
         throws_ok {
@@ -74,8 +74,9 @@ subtest 'basics' => sub {
     };
 
     subtest 'chars, seps, and guards' => sub {
-        plan tests => 2;
+        plan tests => 3;
 
+        ok( $hashids->chars,  'has chars' );
         ok( $hashids->seps,   'has seps' );
         ok( $hashids->guards, 'has guards' );
     };
