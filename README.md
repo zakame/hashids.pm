@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/zakame/hashids.pm.png?branch=master)](https://travis-ci.org/zakame/hashids.pm)
+[![Build Status](https://travis-ci.org/zakame/hashids.pm.png?branch=master)](https://travis-ci.org/zakame/hashids.pm) [![Coverage Status](https://coveralls.io/repos/zakame/hashids.pm/badge.png?branch=master)](https://coveralls.io/r/zakame/hashids.pm?branch=master)
 # NAME
 
 Hashids - generate short hashes from numbers
@@ -9,15 +9,15 @@ Hashids - generate short hashes from numbers
     my $hashids = Hashids->new('this is my salt');
 
     # encrypt a single number
-    my $hash = $hashids->encrypt(123);          # 'a79'
-    my $number = $hashids->decrypt('a79');      # 123
+    my $hash = $hashids->encrypt(123);          # 'YDx'
+    my $number = $hashids->decrypt('YDx');      # 123
 
     # or a list
     $hash = $hashids->encrypt(1, 2, 3);         # 'eGtrS8'
-    my @numbers = $hashids->decrypt('eGtrS8');  # (1, 2, 3)
+    my @numbers = $hashids->decrypt('laHquq');  # (1, 2, 3)
 
     # also get results in an arrayref
-    my $numbers = $hashids->decrypt('eGtrS8');  # [1, 2, 3]
+    my $numbers = $hashids->decrypt('laHquq');  # [1, 2, 3]
 
 # DESCRIPTION
 
@@ -29,12 +29,11 @@ Instead of showing items as `1`, `2`, or `3`, you could show them as
 `b9iLXiAa`, `EATedTBy`, and `Aaco9cy5`.  Hashes depend on your salt
 value.
 
-This implementation follows the v0.1.4 release of hashids.js.  The
-current version of hashids.js (v0.3.0) uses a new algorithm, so the
-hashes produced by this Perl implementation will probably _not_ decrypt
-correctly on the new JavaScript version.  I will be implementing the new
-algorithm very soon, and maybe probably allow some way to toggle between
-algorithms.
+**IMPORTANT**: This implementation follows the v0.3.x API release of
+hashids.js.  The previous API of hashids.js (v0.1.4) can be found in
+Hashids version 0.08 and earlier releases; if you have code that depends
+on this API version, please update it and use a tool like [Carton](https://metacpan.org/pod/Carton) to
+pin your Hashids install until your code is updated.
 
 # METHODS
 
@@ -49,7 +48,9 @@ algorithms.
     - alphabet => 'abcdefghij'
 
         Alphabet set to use.  This is optional as Hashids comes with a default
-        set suitable for URL shortening.
+        set suitable for URL shortening.  Should you choose to supply a custom
+        alphabet, make sure that it is at least 16 characters long, has no
+        spaces, and only has unique characters.
 
     - minHashLength => 5
 
@@ -68,7 +69,7 @@ algorithms.
 
     Decrypt a hash string into its number (or numbers.)  Returns either a
     simple scalar if it is a single number, an arrayref of numbers if it
-    decrypted a set, or `undef` if given bad input.  Use [ref](http://search.cpan.org/perldoc?ref) on the
+    decrypted a set, or `undef` if given bad input.  Use [ref](https://metacpan.org/pod/ref) on the
     result to ensure proper usage.
 
     You can also retrieve the result as a proper list by assigning it to an
@@ -109,7 +110,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Zak B. Elep <zakame@cpan.org>
 
-Original Hashids JavaScript library written by [Ivan Akimov](http://twitter.com/ivanakimov)
+Original Hashids JavaScript library written by [Ivan
+Akimov](http://twitter.com/ivanakimov)
 
 # THANKS
 
