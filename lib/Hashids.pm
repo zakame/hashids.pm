@@ -29,8 +29,15 @@ has alphabet => (
         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 );
 
-has seps   => ( is => 'rwp', init_arg => undef, default => 'cfhistuCFHISTU' );
-has guards => ( is => 'rwp', init_arg => undef, default => '' );
+has seps => (
+    is       => 'rwp',
+    init_arg => undef,
+    default  => sub {
+        my @seps = qw(c f h i s t u);
+        [ @seps, map {uc} @seps ];
+    },
+);
+has guards => ( is => 'rwp', init_arg => undef, default => sub { [] } );
 
 sub BUILDARGS {
     my ( $class, @args ) = @_;
@@ -50,7 +57,7 @@ sub BUILD {
 
     # seps should contain only chars present in alphabet;
     # alphabet should not contain seps
-    for my $sep ( split //, $self->seps ) {
+    for my $sep ( @{ $self->seps } ) {
         push @seps, $sep if grep {/$sep/} @alphabet;
         @alphabet = grep { !/$sep/ } @alphabet;
     }
@@ -59,12 +66,9 @@ sub BUILD {
 
     if ( !@seps || ( @alphabet / @seps ) > $sepDiv ) {
         my $sepsLength = POSIX::ceil( @alphabet / $sepDiv );
-        if ( $sepsLength == 1 ) {
-            $sepsLength++;
-        }
+        $sepsLength++ if $sepsLength == 1;
         if ( $sepsLength > @seps ) {
-            my $diff = $sepsLength - @seps;
-            push @seps => splice @alphabet, 0, $diff;
+            push @seps => splice @alphabet, 0, $sepsLength - @seps;
         }
         else {
             splice @seps, 0, $sepsLength;
@@ -74,16 +78,14 @@ sub BUILD {
     @alphabet = $self->_consistentShuffle( \@alphabet, $self->salt );
     my $guardCount = POSIX::ceil( @alphabet / $guardDiv );
 
-    if ( @alphabet < 3 ) {
-        @guards = splice @seps, 0, $guardCount;
-    }
-    else {
-        @guards = splice @alphabet, 0, $guardCount;
-    }
+    @guards
+        = @alphabet < 3
+        ? splice @seps, 0, $guardCount
+        : splice @alphabet, 0, $guardCount;
 
     $self->_set_alphabet( join '', @alphabet );
-    $self->_set_seps( join '', @seps );
-    $self->_set_guards( join '', @guards );
+    $self->_set_seps( \@seps );
+    $self->_set_guards( \@guards );
 }
 
 sub encrypt {
@@ -105,60 +107,62 @@ sub _encode {
     my ( $self, $num ) = @_;
 
     my @alphabet = split // => $self->alphabet;
-    my @seps     = split // => $self->seps;
-    my @guards   = split // => $self->guards;
-    my $res      = '';
+    my @res;
 
     my ( $i, $numHashInt, $sepsIndex );
     for ( $i = 0; $i != @$num; $i++ ) {
         $numHashInt += ( $num->[$i] % ( $i + 100 ) );
     }
 
-    my $lottery = $res = $alphabet[ $numHashInt % @alphabet ];
+    my $lottery = $res[0] = $alphabet[ $numHashInt % @alphabet ];
     for ( $i = 0; $i != @$num; $i++ ) {
         my $n = $num->[$i];
-        my $b = join '' => $lottery, $self->salt, @alphabet;
+        my @s = ( $lottery, split( //, $self->salt ), @alphabet )
+            [ 0 .. @alphabet ];
 
-        @alphabet = $self->_consistentShuffle( \@alphabet, substr $b, 0,
-            @alphabet );
+        @alphabet = $self->_consistentShuffle( \@alphabet, \@s );
         my $last = $self->_hash( $n, join '' => @alphabet );
 
-        $res = join '' => $res, $last;
+        push @res, split // => $last;
 
         if ( $i + 1 < @$num ) {
+            my $seps = $self->seps;
             $n %= ( ord($last) + $i );
-            $sepsIndex = $n % @seps;
-            $res = join '' => $res, $seps[$sepsIndex];
+            $sepsIndex = $n % @$seps;
+            push @res, $seps->[$sepsIndex];
         }
     }
 
-    my ( $guardIndex, $guard );
-    if ( length $res < $self->minHashLength ) {
-        $guardIndex = ( $numHashInt . +ord $res ) % @guards;
-        $guard      = $guards[$guardIndex];
+    if ( @res < $self->minHashLength ) {
+        my $guards     = $self->guards;
+        my $guardIndex = ( $numHashInt + ord $res[0] ) % @$guards;
+        my $guard      = $guards->[$guardIndex];
 
-        $res = join '' => $guard, $res;
+        unshift @res, $guard;
 
-        if ( length $res < $self->minHashLength ) {
-            $guardIndex = ( $numHashInt . +ord substr $res, 2 ) % @guards;
-            $guard = $guards[$guardIndex];
+        if ( @res < $self->minHashLength ) {
+            $guardIndex = ( $numHashInt + ord $res[2] ) % @$guards;
+            $guard      = $guards->[$guardIndex];
 
-            $res = join '' => $res, $guard;
+            push @res, $guard;
         }
     }
 
-    my $halfLength = @alphabet / 2;
-    while ( length $res < $self->minHashLength ) {
+    my $halfLength = int @alphabet / 2;
+    while ( @res < $self->minHashLength ) {
         @alphabet = $self->_consistentShuffle( \@alphabet, \@alphabet );
-        $res = join '' => splice @alphabet, $halfLength, 1, $res;
+        @res = (
+            @alphabet[ $halfLength .. $#alphabet ],
+            @res, @alphabet[ 0 .. $halfLength - 1 ]
+        );
 
-        my $excess = length $res - $self->minHashLength;
+        my $excess = @res - $self->minHashLength;
         if ( $excess > 0 ) {
-            $res = substr $res, $excess / 2, $self->minHashLength;
+            @res = splice @res, int $excess / 2, $self->minHashLength;
         }
     }
 
-    $res;
+    join '' => @res;
 }
 
 sub _decode {
@@ -170,11 +174,8 @@ sub _decode {
     my $res  = [];
     my $orig = $hash;
 
-    my $guards = $self->guards;
-    {
-        local $_ = $hash;
-        eval "tr/$guards/ /";
-        $hash = $_;
+    for my $guard ( @{ $self->guards } ) {
+        $hash =~ s/$guard/ /;
     }
     my @hash = split / / => $hash;
 
@@ -187,11 +188,8 @@ sub _decode {
     if ( my $lottery = substr $hash, 0, 1 ) {
         $hash = substr $hash, 1;
 
-        my $seps = $self->seps;
-        {
-            local $_ = $hash;
-            eval "tr/$seps/ /";
-            $hash = $_;
+        for my $sep ( @{ $self->seps } ) {
+            $hash =~ s/$sep/ /;
         }
         @hash = split / / => $hash;
 

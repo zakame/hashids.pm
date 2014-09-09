@@ -6,7 +6,7 @@ use Test::More;
 use Test::Exception;
 use Hashids;
 
-plan tests => 5;
+plan tests => 6;
 
 my $salt = "this is my salt";
 
@@ -122,8 +122,19 @@ subtest 'simple encrypt/decrypt' => sub {
     is( $hashids->decrypt($encrypted), $plaintext, 'decrypt 2' );
 };
 
+subtest 'encrypt with minHashLength' => sub {
+    plan tests => 2;
+
+    my $hashids = Hashids->new( salt => $salt, minHashLength => 15 );
+
+    my $plaintext = 123;
+    my $encrypted = 'V34xpAYDx0mQNvl';
+    is( $hashids->encrypt($plaintext), $encrypted, 'encrypt minHashLength' );
+    is( $hashids->decrypt($encrypted), $plaintext, 'decrypt minHashLength' );
+};
+
 subtest 'list encrypt/decrypt' => sub {
-    plan tests => 6;
+    plan tests => 7;
 
     my $hashids = Hashids->new( salt => $salt );
 
@@ -149,6 +160,20 @@ subtest 'list encrypt/decrypt' => sub {
 
         my @result = $hashids->decrypt($encrypted);
         is_deeply( \@result, \@plaintexts, 'decrypted as list (multi)' );
+    };
+
+    subtest 'list encrypt/decrypt with minHashLength' => sub {
+        plan tests => 2;
+
+        $hashids = Hashids->new( salt => $salt, minHashLength => 16 );
+        $encrypted = 'j1DAZ8gi1DIx6Glx';
+
+        is( $hashids->encrypt(@plaintexts),
+            $encrypted, 'encrypt list with minHashLength' );
+
+        my @result = $hashids->decrypt($encrypted);
+        is_deeply( \@result, \@plaintexts,
+            'decrypted as list (minHashLength)' );
     };
 };
 
