@@ -1,2 +1,2 @@
 name="Hashids"
-badges = ['travis']
+badges = ['travis', 'coveralls']
