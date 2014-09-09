@@ -25,7 +25,7 @@ has alphabet => (
         croak "$_[0] must contain unique characters"
             if grep { $u{$_}++ } split // => $_[0];
     },
-    default => sub { join '' => ( 'a' .. 'z', 'A' .. 'Z', 1 .. 9, 0 ) }
+    default => sub { join '' => 'a' .. 'z', 'A' .. 'Z', 1 .. 9, 0 }
 );
 
 has chars => ( is => 'rwp', init_arg => undef, default => sub { [] } );
@@ -109,13 +109,11 @@ sub _encode {
     my @alphabet = @{ $self->chars };
     my @res;
 
-    my ( $i, $numHashInt, $sepsIndex );
-    for ( $i = 0; $i != @$num; $i++ ) {
-        $numHashInt += ( $num->[$i] % ( $i + 100 ) );
-    }
+    my $numHashInt;
+    $numHashInt += ( $num->[$_] % ( $_ + 100 ) ) for 0 .. $#$num;
 
     my $lottery = $res[0] = $alphabet[ $numHashInt % @alphabet ];
-    for ( $i = 0; $i != @$num; $i++ ) {
+    for my $i ( 0 .. $#$num ) {
         my $n = $num->[$i];
         my @s = ( $lottery, split( // => $self->salt ), @alphabet )
             [ 0 .. @alphabet ];
@@ -128,7 +126,7 @@ sub _encode {
         if ( $i + 1 < @$num ) {
             my $seps = $self->seps;
             $n %= ( ord($last) + $i );
-            $sepsIndex = $n % @$seps;
+            my $sepsIndex = $n % @$seps;
             push @res, $seps->[$sepsIndex];
         }
     }
@@ -239,15 +237,15 @@ sub _hash {
 sub _unhash {
     my ( $self, $hash, $alphabet ) = @_;
 
-    $alphabet = join '' => @$alphabet if ref $alphabet eq 'ARRAY';
+    my @alphabet
+        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
 
-    my $num = 0;
-    my $pos;
-
-    my @hash = split //, $hash;
-    for ( my $i = 0; $i < @hash; $i++ ) {
-        $pos = index $alphabet, $hash[$i];
-        $num += $pos * ( length($alphabet)**( @hash - $i - 1 ) );
+    my ( $num, $pos );
+    my @hash = split // => $hash;
+    for my $i ( 0 .. $#hash ) {
+        ($pos) = grep { $alphabet[$_] eq $hash[$i] } 0 .. $#alphabet;
+        $pos = defined $pos ? $pos : -1;
+        $num += $pos * ( @alphabet**( @hash - $i - 1 ) );
     }
 
     $num;
