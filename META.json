@@ -66,7 +66,7 @@
          "web" : "https://github.com/zakame/hashids.pm"
       }
    },
-   "version" : "0.08",
+   "version" : "1.000000",
    "x_contributors" : [
       "Zak B. Elep <zakame@zakame.net>"
    ]
