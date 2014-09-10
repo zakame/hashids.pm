@@ -2,6 +2,14 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.000000 2014-09-10T13:00:52Z
+
+    - Bump to 1.0.0 hashids.js API, closes #5
+    - Add encode_hex() and decode_hex() methods
+    - Add Perl 5.20 to travis build
+    - Add coveralls test coverage reporting
+    - Add more tests
+
 0.08 2013-10-20T10:58:30Z
 
     - Check intial arguments sooner
