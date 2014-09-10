@@ -16,11 +16,11 @@ isa_ok( $subclass, 'SubClassTest' );
 isa_ok( $subclass, 'Hashids' );
 
 my $plaintext = 456;
-my $encrypted = 'MlpTgL';
+my $encoded   = 'MlpTgL';
 
-is( $subclass->encrypt($plaintext), $encrypted, 'subclass encrypted' );
+is( $subclass->encode($plaintext), $encoded, 'subclass encoded' );
 is_deeply(
-    scalar $subclass->decrypt($encrypted),
+    scalar $subclass->decode($encoded),
     [ $subclass->extra_number, $plaintext ],
-    'subclass decrypted'
+    'subclass encoded'
 );

@@ -1,6 +1,6 @@
 package Hashids;
 
-our $VERSION = "0.08";
+our $VERSION = "1.000000";
 
 use Carp;
 use Moo;
@@ -88,7 +88,7 @@ sub BUILD {
     $self->_set_guards( \@guards );
 }
 
-sub encrypt {
+sub encode {
     my ( $self, @num ) = @_;
 
     return '' unless @num;
@@ -97,10 +97,40 @@ sub encrypt {
     $self->_encode( \@num );
 }
 
-sub decrypt {
+sub decode {
     my ( $self, $hash ) = @_;
     return unless $hash;
     $self->_decode($hash);
+}
+
+sub encode_hex {
+    my ( $self, $str ) = @_;
+
+    return '' unless $str =~ /^[0-9a-fA-F]+$/;
+
+    my @num;
+    push @num, '1' . substr $str, 0, 11, '' while $str;
+
+    no warnings 'portable';
+    @num = map {hex} @num;
+
+    $self->encode(@num);
+}
+
+sub decode_hex {
+    my ( $self, $hash ) = @_;
+
+    my @res = $self->decode($hash);
+
+    @res ? join '' => map { substr sprintf( "%x", $_ ), 1 } @res : '';
+}
+
+sub encrypt {
+    shift->encode(@_);
+}
+
+sub decrypt {
+    shift->decode(shift);
 }
 
 sub _encode {
@@ -192,7 +222,7 @@ sub _decode {
         }
     }
 
-    return unless $self->Hashids::encrypt(@$res) eq $orig;
+    return unless $self->Hashids::encode(@$res) eq $orig;
 
     wantarray ? @$res : @$res == 1 ? $res->[0] : $res;
 }
@@ -266,15 +296,15 @@ Hashids - generate short hashes from numbers
     my $hashids = Hashids->new('this is my salt');
 
     # encrypt a single number
-    my $hash = $hashids->encrypt(123);          # 'YDx'
-    my $number = $hashids->decrypt('YDx');      # 123
+    my $hash = $hashids->encode(123);          # 'YDx'
+    my $number = $hashids->decode('YDx');      # 123
 
     # or a list
-    $hash = $hashids->encrypt(1, 2, 3);         # 'eGtrS8'
-    my @numbers = $hashids->decrypt('laHquq');  # (1, 2, 3)
+    $hash = $hashids->encode(1, 2, 3);         # 'eGtrS8'
+    my @numbers = $hashids->decode('laHquq');  # (1, 2, 3)
 
     # also get results in an arrayref
-    my $numbers = $hashids->decrypt('laHquq');  # [1, 2, 3]
+    my $numbers = $hashids->decode('laHquq');  # [1, 2, 3]
 
 =head1 DESCRIPTION
 
@@ -286,11 +316,13 @@ Instead of showing items as C<1>, C<2>, or C<3>, you could show them as
 C<b9iLXiAa>, C<EATedTBy>, and C<Aaco9cy5>.  Hashes depend on your salt
 value.
 
-B<IMPORTANT>: This implementation follows the v0.3.x API release of
-hashids.js.  The previous API of hashids.js (v0.1.4) can be found in
-Hashids version 0.08 and earlier releases; if you have code that depends
-on this API version, please update it and use a tool like L<Carton> to
-pin your Hashids install until your code is updated.
+B<IMPORTANT>: This implementation follows the v1.0.0 API release of
+hashids.js.  An older API of hashids.js (v0.1.4) can be found in Hashids
+version 0.08 and earlier releases; if you have code that depends on this
+API version, please use a tool like L<Carton> to pin your Hashids
+install to the older version.
+
+This implementation is also compatible with the v0.3.x hashids.js API.
 
 =head1 METHODS
 
@@ -324,13 +356,21 @@ You can also construct with just a single argument for the salt:
 
     my $hashids = Hashids->new('this is my salt');
 
-=item  my $hash = $hashids->encrypt($x, [$y, $z, ...]);
+=item  my $hash = $hashids->encode($x, [$y, $z, ...]);
 
-Encrypt a single number (or a list of numbers) into a hash string.
+Encode a single number (or a list of numbers) into a hash
+string.
 
-=item  my $number = $hashids->decrypt($hash);
+C<encrypt> is an alias for this method, for compatibility with v0.3.x
+hashids.js API.
 
-Decrypt a hash string into its number (or numbers.)  Returns either a
+=item my $hash = $hashids->encode_hex('deadbeef');
+
+Encode a hex string into a hash string.
+
+=item  my $number = $hashids->decode($hash);
+
+Decode a hash string into its number (or numbers.)  Returns either a
 simple scalar if it is a single number, an arrayref of numbers if it
 decrypted a set, or C<undef> if given bad input.  Use L<ref> on the
 result to ensure proper usage.
@@ -340,7 +380,15 @@ array variable, by doing so you will always get a list of one or more
 numbers that are decrypted from the hash, or the empty list if none were
 found:
 
-    my @numbers = $hashids->decrypt($hash);
+    my @numbers = $hashids->decode($hash);
+
+C<decrypt> is an alias for this method, for compatibility with v0.3.x
+hashids.js API.
+
+=item my $hex_string = $hashids->decode_hex($hash);
+
+Opposite of L<encode_hex>.  Unlike L<decode>, this will always return a
+string, including the empty string if the hash is invalid.
 
 =back
 
