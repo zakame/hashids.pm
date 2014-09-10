@@ -171,7 +171,7 @@ sub _decode {
     my $res  = [];
     my $orig = $hash;
 
-    my $guard = join '|', @{ $self->guards };
+    my $guard = join '|', map {quotemeta} @{ $self->guards };
     my @hash = grep { !/^$/ } split /$guard/ => $hash;
     my $i = ( @hash == 3 || @hash == 2 ) ? 1 : 0;
 

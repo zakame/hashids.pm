@@ -6,7 +6,7 @@ use Test::More;
 use Test::Exception;
 use Hashids;
 
-plan tests => 6;
+plan tests => 7;
 
 my $salt = "this is my salt";
 
@@ -195,4 +195,20 @@ subtest 'work with counting numbers only' => sub {
     is( $hashids->encrypt(-1),   '', 'not a positive integer' );
     is( $hashids->encrypt( 123, 45.6 ), '', 'no integer in list' );
     is( $hashids->encrypt( -1, -2, 3 ), '', 'negative integers in list' );
+};
+
+subtest 'work with custom alphabets' => sub {
+    plan tests => 2;
+
+    # also tests for regex meta chars and alphabets with mostly seps
+    my $alphabet = 'cfhistuCFHISTU+-*/';
+    my $hashids = Hashids->new( salt => $salt, alphabet => $alphabet );
+
+    my @plaintext = ( 1, 2, 3 );
+    my $encrypted = '+-H/u/+';
+    is( $hashids->encrypt(@plaintext),
+        $encrypted, 'encrypt with mostly seps' );
+
+    my @result = $hashids->decrypt($encrypted);
+    is_deeply( \@result, \@plaintext, 'decrypt with mostly seps' );
 };
