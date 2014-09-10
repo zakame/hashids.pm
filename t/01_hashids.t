@@ -198,7 +198,7 @@ subtest 'work with counting numbers only' => sub {
 };
 
 subtest 'work with custom alphabets' => sub {
-    plan tests => 2;
+    plan tests => 4;
 
     # also tests for regex meta chars and alphabets with mostly seps
     my $alphabet = 'cfhistuCFHISTU+-*/';
@@ -211,4 +211,13 @@ subtest 'work with custom alphabets' => sub {
 
     my @result = $hashids->decrypt($encrypted);
     is_deeply( \@result, \@plaintext, 'decrypt with mostly seps' );
+
+    # test for alphabet with no seps
+    $alphabet = 'abdegjklmnop+-*/';
+    $hashids = Hashids->new( salt => $salt, alphabet => $alphabet );
+
+    $encrypted = 'olb*do';
+    is( $hashids->encrypt(@plaintext), $encrypted, 'encrypt with no seps' );
+    @result = $hashids->decrypt($encrypted);
+    is_deeply( \@result, \@plaintext, 'decrypt with no seps' );
 };
