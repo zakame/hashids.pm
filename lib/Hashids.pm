@@ -70,9 +70,9 @@ sub BUILD {
         if ( $sepsLength > @seps ) {
             push @seps => splice @alphabet, 0, $sepsLength - @seps;
         }
-        else {
-            splice @seps, 0, $sepsLength;
-        }
+        # else {
+        #     splice @seps, 0, $sepsLength;
+        # }
     }
 
     @alphabet = $self->_consistentShuffle( \@alphabet, $self->salt );
