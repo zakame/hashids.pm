@@ -197,7 +197,7 @@ subtest 'work with counting numbers only' => sub {
 };
 
 subtest 'encode hex strings' => sub {
-    plan tests => 2;
+    plan tests => 4;
 
     my $hashids = Hashids->new( salt => $salt );
 
@@ -205,6 +205,9 @@ subtest 'encode hex strings' => sub {
     my $encoded   = 'kRNrpKlJ';
     is( $hashids->encode_hex($plaintext), $encoded,   'encode hex string' );
     is( $hashids->decode_hex($encoded),   $plaintext, 'decode hex string' );
+
+    is( $hashids->encode_hex('invalid'), '', 'invalid encode hex string' );
+    is( $hashids->decode_hex('invalid'), '', 'invalid decode hex string' );
 };
 
 subtest 'work with custom alphabets' => sub {
