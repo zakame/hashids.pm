@@ -68,7 +68,7 @@ This implementation is also compatible with the v0.3.x hashids.js API.
     Encode a single number (or a list of numbers) into a hash
     string.
 
-    `encrypt` is an alias for this method, for compatibility with v0.3.x
+    _encrypt()_ is an alias for this method, for compatibility with v0.3.x
     hashids.js API.
 
 - my $hash = $hashids->encode\_hex('deadbeef');
@@ -79,8 +79,8 @@ This implementation is also compatible with the v0.3.x hashids.js API.
 
     Decode a hash string into its number (or numbers.)  Returns either a
     simple scalar if it is a single number, an arrayref of numbers if it
-    decrypted a set, or `undef` if given bad input.  Use [ref](https://metacpan.org/pod/ref) on the
-    result to ensure proper usage.
+    decrypted a set, or `undef` if given bad input.  Use ["ref" in perlfunc](https://metacpan.org/pod/perlfunc#ref) on
+    the result to ensure proper usage.
 
     You can also retrieve the result as a proper list by assigning it to an
     array variable, by doing so you will always get a list of one or more
@@ -89,13 +89,13 @@ This implementation is also compatible with the v0.3.x hashids.js API.
 
         my @numbers = $hashids->decode($hash);
 
-    `decrypt` is an alias for this method, for compatibility with v0.3.x
+    _decrypt()_ is an alias for this method, for compatibility with v0.3.x
     hashids.js API.
 
 - my $hex\_string = $hashids->decode\_hex($hash);
 
-    Opposite of [encode\_hex](https://metacpan.org/pod/encode_hex).  Unlike [decode](https://metacpan.org/pod/decode), this will always return a
-    string, including the empty string if the hash is invalid.
+    Opposite of _encode\_hex()_.  Unlike _decode()_, this will always
+    return a string, including the empty string if the hash is invalid.
 
 # SEE ALSO
 
