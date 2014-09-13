@@ -237,11 +237,9 @@ sub _consistentShuffle {
     return wantarray ? @alphabet : join '', @alphabet unless $salt;
     my @salt = ref $salt eq 'ARRAY' ? @$salt : split //, $salt;
 
-    my ( $int, $temp, $j );
     for ( my ( $i, $v, $p ) = ( $#alphabet, 0, 0 ); $i > 0; $i--, $v++ ) {
-        $v %= @salt;
-        $p += $int = ord $salt[$v];
-        $j = ( $int + $v + $p ) % $i;
+        $p += my $int = ord $salt[ $v %= @salt ];
+        my $j = ( $int + $v + $p ) % $i;
 
         @alphabet[ $j, $i ] = @alphabet[ $i, $j ];
     }
