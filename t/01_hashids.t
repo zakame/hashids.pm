@@ -6,7 +6,7 @@ use Test::More;
 use Test::Exception;
 use Hashids;
 
-plan tests => 9;
+plan tests => 10;
 
 my $salt = "this is my salt";
 
@@ -253,3 +253,26 @@ subtest 'v0.3.0 hashids.js API compatibility' => sub {
     my @result = $hashids->decrypt($encrypted);
     is_deeply( \@result, \@plaintexts, 'decrypt 2' );
 };
+
+TODO: {
+    local $TODO = 'fix 2^53+1 issue';
+
+    my $hashids = Hashids->new;
+    my %bignums = (
+        9_007_199_254_740_992   => 'mNWyy8yjQYE',
+        9_007_199_254_740_993   => 'n6WOO7OkrgY',
+        18_014_398_509_481_984  => '7KpVVxJ6pOy',
+        18_014_398_509_481_985  => '8LMKKyYqMOg',
+        152_921_504_606_846_976 => 'YkZM1Vrj77o0'
+    );
+
+    subtest 'JS vs Perl bignums' => sub {
+        plan tests => scalar( keys %bignums ) * 2;
+        for my $bignum ( keys %bignums ) {
+            is( $hashids->encode($bignum),
+                $bignums{$bignum}, "encode bignum $bignum" );
+            is( $hashids->decode( $bignums{$bignum} ),
+                $bignum, "decode bignum $bignum" );
+        }
+    };
+}
