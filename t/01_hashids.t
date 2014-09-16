@@ -259,11 +259,11 @@ TODO: {
 
     my $hashids = Hashids->new;
     my %bignums = (
-        9_007_199_254_740_992   => 'mNWyy8yjQYE',
-        9_007_199_254_740_993   => 'n6WOO7OkrgY',
-        18_014_398_509_481_984  => '7KpVVxJ6pOy',
-        18_014_398_509_481_985  => '8LMKKyYqMOg',
-        152_921_504_606_846_976 => 'YkZM1Vrj77o0'
+        9_007_199_254_740_992     => 'mNWyy8yjQYE',
+        9_007_199_254_740_993     => 'n6WOO7OkrgY',
+        18_014_398_509_481_984    => '7KpVVxJ6pOy',
+        18_014_398_509_481_985    => '8LMKKyYqMOg',
+        1_152_921_504_606_846_976 => 'YkZM1Vrj77o0'
     );
 
     subtest 'JS vs Perl bignums' => sub {
