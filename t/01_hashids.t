@@ -113,7 +113,7 @@ subtest 'internal functions' => sub {
 };
 
 subtest 'simple encode/decode' => sub {
-    plan tests => 6;
+    plan tests => 1007;
 
     my $hashids = Hashids->new( salt => $salt );
 
@@ -129,6 +129,11 @@ subtest 'simple encode/decode' => sub {
     $encoded   = '4DLz6';
     is( $hashids->encode($plaintext), $encoded,   'encode 2' );
     is( $hashids->decode($encoded),   $plaintext, 'decode 2' );
+    
+    foreach(0..1000) {
+        my $new = $hashids->encode($_);
+        is( $hashids->decode($new), $_, "decode val $_");
+    }
 };
 
 subtest 'encode with minHashLength' => sub {
