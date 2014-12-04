@@ -1,6 +1,6 @@
 package Hashids;
 
-our $VERSION = "1.000000";
+our $VERSION = "1.000001";
 
 use Carp;
 use Moo;
