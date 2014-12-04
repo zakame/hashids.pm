@@ -205,7 +205,7 @@ sub _decode {
     my @hash = grep { !/^$/ } split /$guard/ => $hash;
     my $i = ( @hash == 3 || @hash == 2 ) ? 1 : 0;
 
-    $hash = $hash[$i];
+    return unless defined( $hash = $hash[$i] );
     my $lottery = substr $hash, 0, 1;
     $hash = substr $hash, 1;
 
