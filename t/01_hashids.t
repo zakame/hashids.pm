@@ -6,7 +6,7 @@ use Test::More;
 use Test::Exception;
 use Hashids;
 
-plan tests => 10;
+plan tests => 11;
 
 my $salt = "this is my salt";
 
@@ -129,6 +129,7 @@ subtest 'simple encode/decode' => sub {
     $encoded   = '4DLz6';
     is( $hashids->encode($plaintext), $encoded,   'encode 2' );
     is( $hashids->decode($encoded),   $plaintext, 'decode 2' );
+    
 };
 
 subtest 'encode with minHashLength' => sub {
@@ -252,6 +253,26 @@ subtest 'v0.3.0 hashids.js API compatibility' => sub {
     is( $hashids->encrypt(@plaintexts), $encrypted, 'encrypt 2' );
     my @result = $hashids->decrypt($encrypted);
     is_deeply( \@result, \@plaintexts, 'decrypt 2' );
+};
+
+subtest 'test encode/decode series comparison' => sub {
+    
+    plan tests => 1002;
+    
+    my $hashids = Hashids->new('fdfs42842f');
+    
+    foreach(0..1000) {
+        my $new = $hashids->encode($_);
+        is( $hashids->decode($new), $_, "encode/decode val $_");
+    }    
+    
+        # test array of hashes that start with zero
+    my @arr = (99, 111, 599, 811, 955);
+    my $encoded = $hashids->encode(@arr);
+    my @decoded = $hashids->decode($encoded);
+    
+    is_deeply( \@decoded, \@arr, 'known array series');
+    
 };
 
 TODO: {

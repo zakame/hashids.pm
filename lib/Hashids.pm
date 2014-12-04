@@ -206,20 +206,19 @@ sub _decode {
     my $i = ( @hash == 3 || @hash == 2 ) ? 1 : 0;
 
     $hash = $hash[$i];
-    if ( my $lottery = substr $hash, 0, 1 ) {
-        $hash = substr $hash, 1;
+    my $lottery = substr $hash, 0, 1;
+    $hash = substr $hash, 1;
 
-        my $sep = join '|', @{ $self->seps };
-        @hash = grep { !/^$/ } split /$sep/ => $hash;
+    my $sep = join '|', @{ $self->seps };
+    @hash = grep { !/^$/ } split /$sep/ => $hash;
 
-        my @alphabet = @{ $self->chars };
-        for my $part (@hash) {
-            my @s = ( $lottery, split( // => $self->salt ), @alphabet )
-                [ 0 .. @alphabet ];
+    my @alphabet = @{ $self->chars };
+    for my $part (@hash) {
+        my @s = ( $lottery, split( // => $self->salt ), @alphabet )
+            [ 0 .. @alphabet ];
 
-            @alphabet = $self->_consistentShuffle( \@alphabet, \@s );
-            push @$res => $self->_unhash( $part, \@alphabet );
-        }
+        @alphabet = $self->_consistentShuffle( \@alphabet, \@s );
+        push @$res => $self->_unhash( $part, \@alphabet );
     }
 
     return unless $self->Hashids::encode(@$res) eq $orig;
