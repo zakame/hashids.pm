@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Minilla/v2.2.1, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "mit"
    ],
@@ -68,6 +68,7 @@
    },
    "version" : "1.000000",
    "x_contributors" : [
+      "C. A. Church <thisdroneeatspeople@gmail.com>",
       "Zak B. Elep <zakame@zakame.net>"
    ]
 }
