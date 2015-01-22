@@ -1,12 +1,14 @@
-package Hashids;
+package Hashids::BigInt;
 
-our $VERSION = "1.000001";
+our $VERSION = "1.000002";
 
 use Carp;
 use Moo;
 use POSIX ();
+use Math::BigInt ();
 
 has salt => ( is => 'ro', default => '' );
+
 has minHashLength => (
     is  => 'ro',
     isa => sub {
@@ -14,6 +16,7 @@ has minHashLength => (
     },
     default => 0
 );
+
 has alphabet => (
     is  => 'rwp',
     isa => sub {
@@ -29,6 +32,7 @@ has alphabet => (
 );
 
 has chars => ( is => 'rwp', init_arg => undef, default => sub { [] } );
+
 has seps => (
     is       => 'rwp',
     init_arg => undef,
@@ -37,6 +41,7 @@ has seps => (
         [ @seps, map {uc} @seps ];
     },
 );
+
 has guards => ( is => 'rwp', init_arg => undef, default => sub { [] } );
 
 sub BUILDARGS {
@@ -94,6 +99,8 @@ sub encode {
     return '' unless @num;
     map { return '' unless /^\d+$/ } @num;
 
+    @num = map {_bignum($_)} @num;
+	
     $self->_encode( \@num );
 }
 
@@ -111,8 +118,8 @@ sub encode_hex {
     my @num;
     push @num, '1' . substr $str, 0, 11, '' while $str;
 
-    no warnings 'portable';
-    @num = map {hex} @num;
+    # no warnings 'portable';
+    @num = map {Math::BigInt->from_hex($_)} @num;
 
     $self->encode(@num);
 }
@@ -122,7 +129,8 @@ sub decode_hex {
 
     my @res = $self->decode($hash);
 
-    @res ? join '' => map { substr sprintf( "%x", $_ ), 1 } @res : '';
+	# as_hex includes the leading 0x, so we use three instead of 1
+    @res ? join '' => map { substr(_bignum($_)->as_hex(),3) } @res : '';
 }
 
 sub encrypt {
@@ -139,12 +147,15 @@ sub _encode {
     my @alphabet = @{ $self->chars };
     my @res;
 
-    my $numHashInt;
-    $numHashInt += ( $num->[$_] % ( $_ + 100 ) ) for 0 .. $#$num;
+    my $numHashInt = _bignum(0);
+    for my $i ( 0 .. $#$num ) { 
+      $numHashInt->badd(_bignum($num->[$i])->bmod(_bignum($i + 100)));
+    }
 
-    my $lottery = $res[0] = $alphabet[ $numHashInt % @alphabet ];
+    my $lottery = $res[0] = $alphabet[ _bignum($numHashInt)->bmod(_bignum(scalar @alphabet))->numify() ];
+	
     for my $i ( 0 .. $#$num ) {
-        my $n = $num->[$i];
+        my $n = _bignum($num->[$i]);
         my @s = ( $lottery, split( // => $self->salt ), @alphabet )
             [ 0 .. @alphabet ];
 
@@ -155,22 +166,22 @@ sub _encode {
 
         if ( $i + 1 < @$num ) {
             my $seps = $self->seps;
-            $n %= ( ord($last) + $i );
-            my $sepsIndex = $n % @$seps;
-            push @res, $seps->[$sepsIndex];
+            $n->bmod( _bignum(ord($last) + $i) );
+            my $sepsIndex = _bignum($n)->bmod(_bignum(scalar @$seps));
+            push @res, $seps->[$sepsIndex->numify()];
         }
     }
 
     if ( @res < $self->minHashLength ) {
         my $guards     = $self->guards;
-        my $guardIndex = ( $numHashInt + ord $res[0] ) % @$guards;
-        my $guard      = $guards->[$guardIndex];
+        my $guardIndex = _bignum($numHashInt)->badd(_bignum(ord $res[0]))->bmod(__bignum(scalar @$guards));
+        my $guard      = $guards->[$guardIndex->numify()];
 
         unshift @res, $guard;
 
         if ( @res < $self->minHashLength ) {
-            $guardIndex = ( $numHashInt + ord $res[2] ) % @$guards;
-            $guard      = $guards->[$guardIndex];
+            $guardIndex = _bignum($numHashInt)->badd(_bignum(ord $res[2]))->bmod(_bignum(scalar @$guards));
+            $guard      = $guards->[$guardIndex->numify()];
 
             push @res, $guard;
         }
@@ -221,7 +232,7 @@ sub _decode {
         push @$res => $self->_unhash( $part, \@alphabet );
     }
 
-    return unless $self->Hashids::encode(@$res) eq $orig;
+    return unless $self->encode(@$res) eq $orig;
 
     wantarray ? @$res : @$res == 1 ? $res->[0] : $res;
 }
@@ -250,13 +261,12 @@ sub _hash {
     my ( $self, $num, $alphabet ) = @_;
 
     my $hash = '';
-    my @alphabet
-        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
+    my @alphabet = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
 
     do {
-        $hash = $alphabet[ $num % @alphabet ] . $hash;
-        $num  = int( $num / @alphabet );
-    } while ($num);
+        $hash = $alphabet[ _bignum($num)->bmod(_bignum(scalar @alphabet))->numify() ] . $hash;
+        $num->bdiv(_bignum(scalar @alphabet) );
+    } while ($num->bcmp(_bignum(0)));
 
     $hash;
 }
@@ -264,20 +274,25 @@ sub _hash {
 sub _unhash {
     my ( $self, $hash, $alphabet ) = @_;
 
-    my @alphabet
-        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
+    my @alphabet = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
 
-    my ( $num, $pos );
+    my $num = _bignum(0);
+    my $pos;
     my @hash = split // => $hash;
     for my $i ( 0 .. $#hash ) {
         ($pos) = grep { $alphabet[$_] eq $hash[$i] } 0 .. $#alphabet;
         $pos = defined $pos ? $pos : -1;
-        $num += $pos * ( @alphabet**( @hash - $i - 1 ) );
+        $num->badd(_bignum($pos)->bmul(_bignum(scalar @alphabet)->bpow(@hash-$i-1)));
     }
 
-    $num;
+    $num->bstr();
 }
 
+sub _bignum {
+	my $n = Math::BigInt->bzero();
+	$n->round_mode('zero');
+	return $n->badd(shift);
+}
 1;
 __END__
 
