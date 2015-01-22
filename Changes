@@ -2,6 +2,10 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.000002 2015-01-21T23:40:00Z
+
+    - Switched calculations to use Math::BigInt to handle larger integers
+
 1.000001 2014-12-04T06:54:57Z
 
     - Fix issue where some hashes could not be decoded, thanks to
