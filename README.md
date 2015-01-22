@@ -135,3 +135,7 @@ Akimov](http://twitter.com/ivanakimov)
 
 Props to [Jofell Gallardo](http://twitter.com/jofell) for pointing this
 excellent project to me in the first place.
+
+Many thanks to [C. A. Church](https://github.com/thisdroneeatspeople)
+and [Troy Morehouse](https://github.com/tmorehouse) for their fixes and
+updates.

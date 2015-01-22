@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.2.1, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "mit"
    ],
@@ -43,6 +43,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.26",
+            "Math::BigInt" : "1.9993",
             "Moo" : "1.003000",
             "perl" : "5.008001"
          }
@@ -66,9 +67,10 @@
          "web" : "https://github.com/zakame/hashids.pm"
       }
    },
-   "version" : "1.000001",
+   "version" : "1.000002",
    "x_contributors" : [
       "C. A. Church <thisdroneeatspeople@gmail.com>",
+      "Troy Morehouse <troymore@nbnet.nb.ca>",
       "Zak B. Elep <zakame@zakame.net>"
    ]
 }
