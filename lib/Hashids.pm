@@ -174,7 +174,7 @@ sub _encode {
 
     if ( @res < $self->minHashLength ) {
         my $guards     = $self->guards;
-        my $guardIndex = _bignum($numHashInt)->badd(_bignum(ord $res[0]))->bmod(__bignum(scalar @$guards));
+        my $guardIndex = _bignum($numHashInt)->badd(_bignum(ord $res[0]))->bmod(_bignum(scalar @$guards));
         my $guard      = $guards->[$guardIndex->numify()];
 
         unshift @res, $guard;
