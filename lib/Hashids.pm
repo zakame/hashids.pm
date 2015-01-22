@@ -5,7 +5,7 @@ our $VERSION = "1.000002";
 use Carp;
 use Moo;
 use POSIX ();
-use Math::BigInt ();
+use Math::BigInt;
 
 has salt => ( is => 'ro', default => '' );
 
@@ -99,8 +99,8 @@ sub encode {
     return '' unless @num;
     map { return '' unless /^\d+$/ } @num;
 
-    @num = map {_bignum($_)} @num;
-	
+    @num = map { _bignum($_) } @num;
+
     $self->_encode( \@num );
 }
 
@@ -119,7 +119,7 @@ sub encode_hex {
     push @num, '1' . substr $str, 0, 11, '' while $str;
 
     # no warnings 'portable';
-    @num = map {Math::BigInt->from_hex($_)} @num;
+    @num = map { Math::BigInt->from_hex($_) } @num;
 
     $self->encode(@num);
 }
@@ -129,8 +129,8 @@ sub decode_hex {
 
     my @res = $self->decode($hash);
 
-	# as_hex includes the leading 0x, so we use three instead of 1
-    @res ? join '' => map { substr(_bignum($_)->as_hex(),3) } @res : '';
+    # as_hex includes the leading 0x, so we use three instead of 1
+    @res ? join '' => map { substr( _bignum($_)->as_hex(), 3 ) } @res : '';
 }
 
 sub encrypt {
@@ -148,14 +148,16 @@ sub _encode {
     my @res;
 
     my $numHashInt = _bignum(0);
-    for my $i ( 0 .. $#$num ) { 
-      $numHashInt->badd(_bignum($num->[$i])->bmod(_bignum($i + 100)));
+    for my $i ( 0 .. $#$num ) {
+        $numHashInt->badd(
+            _bignum( $num->[$i] )->bmod( _bignum( $i + 100 ) ) );
     }
 
-    my $lottery = $res[0] = $alphabet[ _bignum($numHashInt)->bmod(_bignum(scalar @alphabet))->numify() ];
-	
+    my $lottery = $res[0] = $alphabet[ _bignum($numHashInt)
+        ->bmod( _bignum( scalar @alphabet ) )->numify() ];
+
     for my $i ( 0 .. $#$num ) {
-        my $n = _bignum($num->[$i]);
+        my $n = _bignum( $num->[$i] );
         my @s = ( $lottery, split( // => $self->salt ), @alphabet )
             [ 0 .. @alphabet ];
 
@@ -166,22 +168,24 @@ sub _encode {
 
         if ( $i + 1 < @$num ) {
             my $seps = $self->seps;
-            $n->bmod( _bignum(ord($last) + $i) );
-            my $sepsIndex = _bignum($n)->bmod(_bignum(scalar @$seps));
-            push @res, $seps->[$sepsIndex->numify()];
+            $n->bmod( _bignum( ord($last) + $i ) );
+            my $sepsIndex = _bignum($n)->bmod( _bignum( scalar @$seps ) );
+            push @res, $seps->[ $sepsIndex->numify() ];
         }
     }
 
     if ( @res < $self->minHashLength ) {
         my $guards     = $self->guards;
-        my $guardIndex = _bignum($numHashInt)->badd(_bignum(ord $res[0]))->bmod(_bignum(scalar @$guards));
-        my $guard      = $guards->[$guardIndex->numify()];
+        my $guardIndex = _bignum($numHashInt)->badd( _bignum( ord $res[0] ) )
+            ->bmod( _bignum( scalar @$guards ) );
+        my $guard = $guards->[ $guardIndex->numify() ];
 
         unshift @res, $guard;
 
         if ( @res < $self->minHashLength ) {
-            $guardIndex = _bignum($numHashInt)->badd(_bignum(ord $res[2]))->bmod(_bignum(scalar @$guards));
-            $guard      = $guards->[$guardIndex->numify()];
+            $guardIndex = _bignum($numHashInt)->badd( _bignum( ord $res[2] ) )
+                ->bmod( _bignum( scalar @$guards ) );
+            $guard = $guards->[ $guardIndex->numify() ];
 
             push @res, $guard;
         }
@@ -261,13 +265,17 @@ sub _hash {
     my ( $self, $num, $alphabet ) = @_;
 
     my $hash = '';
-    my @alphabet = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
+    my @alphabet
+        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
 
     $num = _bignum($num);
     do {
-        $hash = $alphabet[ _bignum($num)->bmod(_bignum(scalar @alphabet))->numify() ] . $hash;
-        $num->bdiv(_bignum(scalar @alphabet) );
-    } while ($num->bcmp(_bignum(0)));
+        $hash
+            = $alphabet[ _bignum($num)->bmod( _bignum( scalar @alphabet ) )
+            ->numify() ]
+            . $hash;
+        $num->bdiv( _bignum( scalar @alphabet ) );
+    } while ( $num->bcmp( _bignum(0) ) );
 
     $hash;
 }
@@ -275,7 +283,8 @@ sub _hash {
 sub _unhash {
     my ( $self, $hash, $alphabet ) = @_;
 
-    my @alphabet = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
+    my @alphabet
+        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
 
     my $num = _bignum(0);
     my $pos;
@@ -283,16 +292,18 @@ sub _unhash {
     for my $i ( 0 .. $#hash ) {
         ($pos) = grep { $alphabet[$_] eq $hash[$i] } 0 .. $#alphabet;
         $pos = defined $pos ? $pos : -1;
-        $num->badd(_bignum($pos)->bmul(_bignum(scalar @alphabet)->bpow(@hash-$i-1)));
+        $num->badd( _bignum($pos)
+                ->bmul( _bignum( scalar @alphabet )->bpow( @hash - $i - 1 ) )
+        );
     }
 
     $num->bstr();
 }
 
 sub _bignum {
-	my $n = Math::BigInt->bzero();
-	$n->round_mode('zero');
-	return $n->badd(shift);
+    my $n = Math::BigInt->bzero();
+    $n->round_mode('zero');
+    return $n->badd(shift);
 }
 1;
 __END__
