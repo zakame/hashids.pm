@@ -232,7 +232,7 @@ sub _decode {
         push @$res => $self->_unhash( $part, \@alphabet );
     }
 
-    return unless $self->encode(@$res) eq $orig;
+    return unless $self->Hashids::encode(@$res) eq $orig;
 
     wantarray ? @$res : @$res == 1 ? $res->[0] : $res;
 }
