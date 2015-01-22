@@ -5,6 +5,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Hashids;
+use Math::BigInt;
 
 plan tests => 11;
 
@@ -273,25 +274,25 @@ subtest 'test encode/decode series comparison' => sub {
     is_deeply( \@decoded, \@arr, 'known array series' );
 };
 
-TODO: {
-    local $TODO = 'fix 2^53+1 issue';
+subtest 'BigInt and 2^53+1 support' => sub {
 
-    my $hashids = Hashids->new;
+    # bignum keys are strings so that 32-bit perls can read them
     my %bignums = (
-        9_007_199_254_740_992     => 'mNWyy8yjQYE',
-        9_007_199_254_740_993     => 'n6WOO7OkrgY',
-        18_014_398_509_481_984    => '7KpVVxJ6pOy',
-        18_014_398_509_481_985    => '8LMKKyYqMOg',
-        1_152_921_504_606_846_976 => 'YkZM1Vrj77o0'
+        '9_007_199_254_740_992'     => 'mNWyy8yjQYE',
+        '9_007_199_254_740_993'     => 'n6WOO7OkrgY',
+        '18_014_398_509_481_984'    => '7KpVVxJ6pOy',
+        '18_014_398_509_481_985'    => '8LMKKyYqMOg',
+        '1_152_921_504_606_846_976' => 'YkZM1Vrj77o0'
     );
 
-    subtest 'JS vs Perl bignums' => sub {
-        plan tests => scalar( keys %bignums ) * 2;
-        for my $bignum ( keys %bignums ) {
-            is( $hashids->encode($bignum),
-                $bignums{$bignum}, "encode bignum $bignum" );
-            is( $hashids->decode( $bignums{$bignum} ),
-                $bignum, "decode bignum $bignum" );
-        }
-    };
-}
+    plan tests => scalar( keys %bignums ) * 2;
+
+    my $hashids = Hashids->new;
+    for my $bignum ( keys %bignums ) {
+        my $bigint = Math::BigInt->new($bignum);
+        is( $hashids->encode( $bigint->bstr ),
+            $bignums{$bignum}, "encode bignum $bignum" );
+        is( $hashids->decode( $bignums{$bignum} ),
+            $bigint, "decode bignum $bignum" );
+    }
+};

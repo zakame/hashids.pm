@@ -99,7 +99,7 @@ sub encode {
     return '' unless @num;
     map { return '' unless /^\d+$/ } @num;
 
-    @num = map { _bignum($_) } @num;
+    @num = map { _bignum("$_") } @num;
 
     $self->_encode( \@num );
 }
