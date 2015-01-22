@@ -263,6 +263,7 @@ sub _hash {
     my $hash = '';
     my @alphabet = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
 
+    $num = _bignum($num);
     do {
         $hash = $alphabet[ _bignum($num)->bmod(_bignum(scalar @alphabet))->numify() ] . $hash;
         $num->bdiv(_bignum(scalar @alphabet) );
