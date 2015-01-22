@@ -1,4 +1,4 @@
-package Hashids::BigInt;
+package Hashids;
 
 our $VERSION = "1.000002";
 
