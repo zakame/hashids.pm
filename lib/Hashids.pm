@@ -99,7 +99,7 @@ sub encode {
     return '' unless @num;
     map { return '' unless /^\d+$/ } @num;
 
-    @num = map { _bignum("$_") } @num;
+    @num = map { _bignum($_) } @num;
 
     $self->_encode( \@num );
 }
@@ -303,7 +303,7 @@ sub _unhash {
 sub _bignum {
     my $n = Math::BigInt->bzero();
     $n->round_mode('zero');
-    return $n->badd(shift);
+    return $n->badd("@{[shift]}");
 }
 1;
 __END__
