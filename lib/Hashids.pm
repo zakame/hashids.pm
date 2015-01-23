@@ -130,7 +130,7 @@ sub decode_hex {
     my @res = $self->decode($hash);
 
     # as_hex includes the leading 0x, so we use three instead of 1
-    @res ? join '' => map { substr( _bignum($_)->as_hex(), 3 ) } @res : '';
+    @res ? join '' => map { substr( _bignum($_)->as_hex, 3 ) } @res : '';
 }
 
 sub encrypt {
@@ -154,7 +154,7 @@ sub _encode {
     }
 
     my $lottery = $res[0] = $alphabet[ _bignum($numHashInt)
-        ->bmod( _bignum( scalar @alphabet ) )->numify() ];
+        ->bmod( _bignum( scalar @alphabet ) )->numify ];
 
     for my $i ( 0 .. $#$num ) {
         my $n = _bignum( $num->[$i] );
@@ -170,7 +170,7 @@ sub _encode {
             my $seps = $self->seps;
             $n->bmod( _bignum( ord($last) + $i ) );
             my $sepsIndex = _bignum($n)->bmod( _bignum( scalar @$seps ) );
-            push @res, $seps->[ $sepsIndex->numify() ];
+            push @res, $seps->[ $sepsIndex->numify ];
         }
     }
 
@@ -178,14 +178,14 @@ sub _encode {
         my $guards     = $self->guards;
         my $guardIndex = _bignum($numHashInt)->badd( _bignum( ord $res[0] ) )
             ->bmod( _bignum( scalar @$guards ) );
-        my $guard = $guards->[ $guardIndex->numify() ];
+        my $guard = $guards->[ $guardIndex->numify ];
 
         unshift @res, $guard;
 
         if ( @res < $self->minHashLength ) {
             $guardIndex = _bignum($numHashInt)->badd( _bignum( ord $res[2] ) )
                 ->bmod( _bignum( scalar @$guards ) );
-            $guard = $guards->[ $guardIndex->numify() ];
+            $guard = $guards->[ $guardIndex->numify ];
 
             push @res, $guard;
         }
@@ -272,7 +272,7 @@ sub _hash {
     do {
         $hash
             = $alphabet[ _bignum($num)->bmod( _bignum( scalar @alphabet ) )
-            ->numify() ]
+            ->numify ]
             . $hash;
         $num->bdiv( _bignum( scalar @alphabet ) );
     } while ( $num->bcmp( _bignum(0) ) );
@@ -297,7 +297,7 @@ sub _unhash {
         );
     }
 
-    $num->bstr();
+    $num->bstr;
 }
 
 sub _bignum {
@@ -305,6 +305,7 @@ sub _bignum {
     $n->round_mode('zero');
     return $n->badd("@{[shift]}");
 }
+
 1;
 __END__
 
