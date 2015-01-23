@@ -285,7 +285,7 @@ subtest 'BigInt and 2^53+1 support' => sub {
         '1_152_921_504_606_846_976' => 'YkZM1Vrj77o0'
     );
 
-    plan tests => scalar( keys %bignums ) * 2;
+    plan tests => scalar( keys %bignums ) * 2 + 1;
 
     my $hashids = Hashids->new;
     for my $bignum ( keys %bignums ) {
@@ -295,4 +295,26 @@ subtest 'BigInt and 2^53+1 support' => sub {
         is( $hashids->decode( $bignums{$bignum} ),
             $bigint, "decode bignum $bignum" );
     }
+
+    subtest 'BigInt bounds' => sub {
+        my %big6 = (
+            '666_666_666_666' => 'Lg8j28K8w',
+            '6_666_666_666_666' => 'L2jqVjD3v',
+            '66_666_666_666_666' => 'L7q3Gkq5Mw',
+            '666_666_666_666_666' => 'L982g6zWEQv',
+            '6_666_666_666_666_666' => 'LA4V2Z0BAQw',
+            '66_666_666_666_666_666' => 'LglKVmY922Mv',
+            '666_666_666_666_666_666' => 'LVwzmqgWko3w',
+        );
+
+        plan tests => scalar( keys %big6 ) * 2;
+
+        for my $bignum ( keys %big6 ) {
+            my $bigint = Math::BigInt->new($bignum);
+            is( $hashids->encode( $bigint->bstr ),
+                $big6{$bignum}, "encode bignum $bignum" );
+            is( $hashids->decode( $big6{$bignum} ),
+                $bigint, "decode bignum $bignum" );
+        }
+    };
 };
