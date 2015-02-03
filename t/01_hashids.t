@@ -86,30 +86,30 @@ subtest 'basics' => sub {
 subtest 'internal functions' => sub {
     plan tests => 9;
 
-    is( Hashids->_consistentShuffle( '123', 'salt' ), '231', 'shuffle 1' );
-    is( Hashids->_consistentShuffle( 'abcdefghij', 'salt' ),
+    is( Hashids::_consistentShuffle( '123', 'salt' ), '231', 'shuffle 1' );
+    is( Hashids::_consistentShuffle( 'abcdefghij', 'salt' ),
         'iajecbhdgf', 'shuffle 2' );
 
-    is( Hashids->_consistentShuffle( [ '1', '2', '3' ], 'salt' ),
+    is( Hashids::_consistentShuffle( [ '1', '2', '3' ], 'salt' ),
         '231', 'shuffle alphabet list 1' );
-    is( Hashids->_consistentShuffle( [ 'a' .. 'j' ], 'salt' ),
+    is( Hashids::_consistentShuffle( [ 'a' .. 'j' ], 'salt' ),
         'iajecbhdgf', 'shuffle alphabet list 2' );
 
-    my @res = Hashids->_consistentShuffle( '123', 'salt' );
+    my @res = Hashids::_consistentShuffle( '123', 'salt' );
     is_deeply( \@res, [qw( 2 3 1 )], 'shuffle returns a list' );
 
-    is( Hashids->_consistentShuffle( [ 'a' .. 'j' ], [qw( s a l t )] ),
+    is( Hashids::_consistentShuffle( [ 'a' .. 'j' ], [qw( s a l t )] ),
         'iajecbhdgf', 'shuffle with salt as list' );
 
-    is( Hashids->_hash( 123, 'abcdefghij' ), 'bcd', 'internal hash' );
-    is( Hashids->_unhash( 'bcd', 'abcdefghij' ), 123, 'internal unhash' );
+    is( Hashids::_hash( 123, 'abcdefghij' ), 'bcd', 'internal hash' );
+    is( Hashids::_unhash( 'bcd', 'abcdefghij' ), 123, 'internal unhash' );
 
     subtest '_hash/_unhash with list' => sub {
         plan tests => 2;
 
         my @alphabet = qw(a b c d e f g h i j);
-        is( Hashids->_hash( 123, \@alphabet ), 'bcd', 'internal hash' );
-        is( Hashids->_unhash( 'bcd', \@alphabet ), 123, 'internal unhash' );
+        is( Hashids::_hash( 123, \@alphabet ), 'bcd', 'internal hash' );
+        is( Hashids::_unhash( 'bcd', \@alphabet ), 123, 'internal unhash' );
     };
 };
 

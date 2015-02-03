@@ -67,7 +67,7 @@ sub BUILD {
         @alphabet = grep { !/$sep/ } @alphabet;
     }
 
-    @seps = $self->_consistentShuffle( \@seps, $self->salt );
+    @seps = _consistentShuffle( \@seps, $self->salt );
 
     if ( !@seps || ( @alphabet / @seps ) > $sepDiv ) {
         my $sepsLength = POSIX::ceil( @alphabet / $sepDiv );
@@ -80,7 +80,7 @@ sub BUILD {
         # }
     }
 
-    @alphabet = $self->_consistentShuffle( \@alphabet, $self->salt );
+    @alphabet = _consistentShuffle( \@alphabet, $self->salt );
     my $guardCount = POSIX::ceil( @alphabet / $guardDiv );
 
     @guards
@@ -161,8 +161,8 @@ sub _encode {
         my @s = ( $lottery, split( // => $self->salt ), @alphabet )
             [ 0 .. @alphabet ];
 
-        @alphabet = $self->_consistentShuffle( \@alphabet, \@s );
-        my $last = $self->_hash( $n, \@alphabet );
+        @alphabet = _consistentShuffle( \@alphabet, \@s );
+        my $last = _hash( $n, \@alphabet );
 
         push @res => split // => $last;
 
@@ -193,7 +193,7 @@ sub _encode {
 
     my $halfLength = int @alphabet / 2;
     while ( @res < $self->minHashLength ) {
-        @alphabet = $self->_consistentShuffle( \@alphabet, \@alphabet );
+        @alphabet = _consistentShuffle( \@alphabet, \@alphabet );
         @res = (
             @alphabet[ $halfLength .. $#alphabet ],
             @res, @alphabet[ 0 .. $halfLength - 1 ]
@@ -232,8 +232,8 @@ sub _decode {
         my @s = ( $lottery, split( // => $self->salt ), @alphabet )
             [ 0 .. @alphabet ];
 
-        @alphabet = $self->_consistentShuffle( \@alphabet, \@s );
-        push @$res => $self->_unhash( $part, \@alphabet );
+        @alphabet = _consistentShuffle( \@alphabet, \@s );
+        push @$res => _unhash( $part, \@alphabet );
     }
 
     return unless $self->Hashids::encode(@$res) eq $orig;
@@ -242,7 +242,7 @@ sub _decode {
 }
 
 sub _consistentShuffle {
-    my ( $self, $alphabet, $salt ) = @_;
+    my ( $alphabet, $salt ) = @_;
 
     return wantarray ? [''] : '' unless $alphabet;
 
@@ -262,7 +262,7 @@ sub _consistentShuffle {
 }
 
 sub _hash {
-    my ( $self, $num, $alphabet ) = @_;
+    my ( $num, $alphabet ) = @_;
 
     my $hash = '';
     my @alphabet
@@ -281,7 +281,7 @@ sub _hash {
 }
 
 sub _unhash {
-    my ( $self, $hash, $alphabet ) = @_;
+    my ( $hash, $alphabet ) = @_;
 
     my @alphabet
         = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
