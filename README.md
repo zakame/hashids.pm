@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/zakame/hashids.pm.svg?branch=master)](https://travis-ci.org/zakame/hashids.pm) [![Coverage Status](https://img.shields.io/coveralls/zakame/hashids.pm/master.svg)](https://coveralls.io/r/zakame/hashids.pm?branch=master)
+[![Build Status](https://travis-ci.org/zakame/hashids.pm.svg?branch=master)](https://travis-ci.org/zakame/hashids.pm) [![Coverage Status](https://img.shields.io/coveralls/zakame/hashids.pm/master.svg?style=flat)](https://coveralls.io/r/zakame/hashids.pm?branch=master)
 # NAME
 
 Hashids - generate short hashes from numbers
