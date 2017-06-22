@@ -101,15 +101,15 @@ subtest 'internal functions' => sub {
     is( Hashids::_consistentShuffle( [ 'a' .. 'j' ], [qw( s a l t )] ),
         'iajecbhdgf', 'shuffle with salt as list' );
 
-    is( Hashids::_hash( 123, 'abcdefghij' ), 'bcd', 'internal hash' );
-    is( Hashids::_unhash( 'bcd', 'abcdefghij' ), 123, 'internal unhash' );
+    is( Hashids::_toAlphabet( 123, 'abcdefghij' ), 'bcd', 'internal toAlphabet' );
+    is( Hashids::_fromAlphabet( 'bcd', 'abcdefghij' ), 123, 'internal fromAlphabet' );
 
     subtest '_hash/_unhash with list' => sub {
         plan tests => 2;
 
         my @alphabet = qw(a b c d e f g h i j);
-        is( Hashids::_hash( 123, \@alphabet ), 'bcd', 'internal hash' );
-        is( Hashids::_unhash( 'bcd', \@alphabet ), 123, 'internal unhash' );
+        is( Hashids::_toAlphabet( 123, \@alphabet ), 'bcd', 'internal toAlphabet' );
+        is( Hashids::_fromAlphabet( 'bcd', \@alphabet ), 123, 'internal fromAlphabet' );
     };
 };
 

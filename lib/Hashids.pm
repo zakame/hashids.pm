@@ -162,7 +162,7 @@ sub _encode {
             [ 0 .. @alphabet ];
 
         @alphabet = _consistentShuffle( \@alphabet, \@s );
-        my $last = _hash( $n, \@alphabet );
+        my $last = _toAlphabet( $n, \@alphabet );
 
         push @res => split // => $last;
 
@@ -233,7 +233,7 @@ sub _decode {
             [ 0 .. @alphabet ];
 
         @alphabet = _consistentShuffle( \@alphabet, \@s );
-        push @$res => _unhash( $part, \@alphabet );
+        push @$res => _fromAlphabet( $part, \@alphabet );
     }
 
     return unless $self->Hashids::encode(@$res) eq $orig;
@@ -261,7 +261,7 @@ sub _consistentShuffle {
     wantarray ? @alphabet : join '', @alphabet;
 }
 
-sub _hash {
+sub _toAlphabet {
     my ( $num, $alphabet ) = @_;
 
     my $hash = '';
@@ -280,7 +280,7 @@ sub _hash {
     $hash;
 }
 
-sub _unhash {
+sub _fromAlphabet {
     my ( $hash, $alphabet ) = @_;
 
     my @alphabet
