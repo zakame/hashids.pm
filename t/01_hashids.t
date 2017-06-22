@@ -134,7 +134,7 @@ subtest 'simple encode/decode' => sub {
 };
 
 subtest 'encode with minHashLength' => sub {
-    plan tests => 2;
+    plan tests => 4;
 
     my $hashids = Hashids->new( salt => $salt, minHashLength => 15 );
 
@@ -142,6 +142,13 @@ subtest 'encode with minHashLength' => sub {
     my $encoded   = 'V34xpAYDx0mQNvl';
     is( $hashids->encode($plaintext), $encoded,   'encode minHashLength' );
     is( $hashids->decode($encoded),   $plaintext, 'decode minHashLength' );
+
+    $hashids = Hashids->new( salt => '', minHashLength => 12 );
+    $plaintext = [ 123, 456, 789 ];
+    $encoded = 'peEl3fkRIo3d';
+    is( $hashids->encode(@$plaintext), $encoded, 'encode minHashLength(12)' );
+    is_deeply( scalar $hashids->decode($encoded),
+        $plaintext, 'decode minHashLength(12)' );
 };
 
 subtest 'list encode/decode' => sub {
