@@ -2,8 +2,9 @@ package Hashids;
 
 our $VERSION = "1.000002";
 
-use Carp ();
-use POSIX ();
+use Carp       ();
+use List::Util ();
+use POSIX      ();
 use Math::BigInt;
 use Moo;
 
@@ -286,16 +287,10 @@ sub _fromAlphabet {
     my @alphabet
         = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
 
-    my $num = _bignum(0);
-    my $pos;
-    my @hash = split // => $hash;
-    for my $i ( 0 .. $#hash ) {
-        ($pos) = grep { $alphabet[$_] eq $hash[$i] } 0 .. $#alphabet;
-        $pos = defined $pos ? $pos : -1;
-        $num->badd( _bignum($pos)
-                ->bmul( _bignum( scalar @alphabet )->bpow( @hash - $i - 1 ) )
-        );
-    }
+    my $num = _bignum(
+        List::Util::reduce { $a * @alphabet + $b }
+        map { index join( '' => @alphabet ), $_ } split // => $hash
+    );
 
     $num->bstr;
 }
