@@ -2,17 +2,17 @@ package Hashids;
 
 our $VERSION = "1.000002";
 
-use Carp;
-use Moo;
+use Carp ();
 use POSIX ();
 use Math::BigInt;
+use Moo;
 
 has salt => ( is => 'ro', default => '' );
 
 has minHashLength => (
     is  => 'ro',
     isa => sub {
-        croak "$_[0] is not a number!" unless $_[0] =~ /^\d+$/;
+        Carp::croak "$_[0] is not a number!" unless $_[0] =~ /^\d+$/;
     },
     default => 0
 );
@@ -20,12 +20,12 @@ has minHashLength => (
 has alphabet => (
     is  => 'rwp',
     isa => sub {
-        croak "$_[0] must not have spaces"
+        Carp::croak "$_[0] must not have spaces"
             if $_[0] =~ /\s/;
-        croak "$_[0] must contain at least 16 characters"
+        Carp::croak "$_[0] must contain at least 16 characters"
             if length $_[0] < 16;
         my %u;
-        croak "$_[0] must contain unique characters"
+        Carp::croak "$_[0] must contain unique characters"
             if grep { $u{$_}++ } split // => $_[0];
     },
     default => sub { join '' => 'a' .. 'z', 'A' .. 'Z', 1 .. 9, 0 }
