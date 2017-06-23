@@ -16,7 +16,6 @@ use Math::BigInt;
 
 use namespace::clean -except => [qw(import)];
 
-
 sub consistent_shuffle {
     my ( $alphabet, $salt ) = @_;
 
@@ -46,12 +45,9 @@ sub to_alphabet {
 
     $num = bignum($num);
     do {
-        $hash
-            = $alphabet[ bignum($num)->bmod( bignum( scalar @alphabet ) )
-            ->numify ]
-            . $hash;
-        $num->bdiv( bignum( scalar @alphabet ) );
-    } while ( $num->bcmp( bignum(0) ) );
+        $hash = $alphabet[ $num % @alphabet ] . $hash;
+        $num /= @alphabet;
+    } while ( $num != 0 );
 
     $hash;
 }
@@ -67,7 +63,7 @@ sub from_alphabet {
         map { index join( '' => @alphabet ), $_ } split // => $hash
     );
 
-    $num->bstr;
+    "$num";
 }
 
 sub bignum {

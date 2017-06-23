@@ -138,12 +138,10 @@ sub encode {
 
     my $numHashInt = bignum(0);
     for my $i ( 0 .. $#$num ) {
-        $numHashInt->badd(
-            bignum( $num->[$i] )->bmod( bignum( $i + 100 ) ) );
+        $numHashInt += $num->[$i] % ( $i + 100 );
     }
 
-    my $lottery = $res[0] = $alphabet[ bignum($numHashInt)
-        ->bmod( bignum( scalar @alphabet ) )->numify ];
+    my $lottery = $res[0] = $alphabet[ $numHashInt % @alphabet ];
 
     for my $i ( 0 .. $#$num ) {
         my $n = bignum( $num->[$i] );
@@ -156,25 +154,22 @@ sub encode {
         push @res => split // => $last;
 
         if ( $i + 1 < @$num ) {
-            my $seps = $self->seps;
-            $n->bmod( bignum( ord($last) + $i ) );
-            my $sepsIndex = bignum($n)->bmod( bignum( scalar @$seps ) );
-            push @res, $seps->[ $sepsIndex->numify ];
+            $n %= ord($last) + $i;
+            my $sepsIndex = $n % @{$self->seps};
+            push @res, $self->seps->[$sepsIndex];
         }
     }
 
     if ( @res < $self->minHashLength ) {
         my $guards     = $self->guards;
-        my $guardIndex = bignum($numHashInt)->badd( bignum( ord $res[0] ) )
-            ->bmod( bignum( scalar @$guards ) );
-        my $guard = $guards->[ $guardIndex->numify ];
+        my $guardIndex = ( $numHashInt + ord $res[0] ) % @$guards;
+        my $guard      = $guards->[$guardIndex];
 
         unshift @res, $guard;
 
         if ( @res < $self->minHashLength ) {
-            $guardIndex = bignum($numHashInt)->badd( bignum( ord $res[2] ) )
-                ->bmod( bignum( scalar @$guards ) );
-            $guard = $guards->[ $guardIndex->numify ];
+            $guardIndex = ( $numHashInt + ord $res[2] ) % @$guards;
+            $guard      = $guards->[$guardIndex];
 
             push @res, $guard;
         }
