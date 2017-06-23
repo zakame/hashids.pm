@@ -2,6 +2,14 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.000003 2017-06-23T05:51:41Z
+
+    - Add test for encoding lists with set minHashLength
+    - Move private functions into Hashids::Util module
+    - Rename _hash/_unhash to to_alphabet/from_alphabet for
+      consistency with upstream JS methods
+    - Use Horner's method on from_alphabet
+
 1.000002 2015-01-22T09:01:42Z
 
     - Switched calculations to use Math::BigInt, thanks to Troy

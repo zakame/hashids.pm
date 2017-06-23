@@ -4,13 +4,13 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.0.12, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Hashids",
    "no_index" : {
@@ -42,9 +42,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "1.26",
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "List::Util" : "0",
             "Math::BigInt" : "1.9993",
             "Moo" : "1.003000",
+            "POSIX" : "0",
+            "namespace::clean" : "0.27",
             "perl" : "5.008001"
          }
       },
@@ -67,11 +71,11 @@
          "web" : "https://github.com/zakame/hashids.pm"
       }
    },
-   "version" : "1.000002",
+   "version" : "1.000003",
    "x_contributors" : [
       "C. A. Church <thisdroneeatspeople@gmail.com>",
       "Troy Morehouse <troymore@nbnet.nb.ca>",
       "Zak B. Elep <zakame@zakame.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }
