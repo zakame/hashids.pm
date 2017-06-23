@@ -121,6 +121,8 @@ a string, including the empty string if the hash is invalid.
 
 # LICENSE
 
+The MIT License (MIT)
+
 Copyright (C) Zak B. Elep.
 
 Permission is hereby granted, free of charge, to any person obtaining a
