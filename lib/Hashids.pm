@@ -346,49 +346,62 @@ This implementation is also compatible with the v0.3.x hashids.js API.
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item  my $hashids = Hashids->new();
+    my $hashids = Hashids->new();
 
 Make a new Hashids object.  This constructor accepts a few options:
 
+    my $hashids = Hashids->new(
+        salt          => 'this is my salt',
+        alphabet      => 'abcdefghijklmnop',
+        minHashLength => 8
+    );
+
 =over
 
-=item  salt => 'this is my salt'
+=item  salt
 
-Salt string, this should be unique per Hashid object.
+Salt string, this should be unique per Hashids object.
 
-=item  alphabet => 'abcdefghij'
+=item  alphabet
 
 Alphabet set to use.  This is optional as Hashids comes with a default
 set suitable for URL shortening.  Should you choose to supply a custom
 alphabet, make sure that it is at least 16 characters long, has no
 spaces, and only has unique characters.
 
-=item  minHashLength => 5
+=item  minHashLength
 
 Minimum hash length.  Use this to control how long the generated hash
 string should be.
 
 =back
 
-You can also construct with just a single argument for the salt:
+You can also construct with just a single argument for the salt, leaving
+the alphabet and minHashLength at their defaults:
 
     my $hashids = Hashids->new('this is my salt');
 
-=item  my $hash = $hashids->encode($x, [$y, $z, ...]);
+=head2 encode
 
-Encode a single number (or a list of numbers) into a hash
-string.
+    my $hash = $hashids->encode($x, [$y, $z, ...]);
 
-I<encrypt()> is an alias for this method, for compatibility with v0.3.x
-hashids.js API.
+Encode a single number (or a list of numbers) into a hash string.
 
-=item  my $hash = $hashids->encode_hex('deadbeef');
+=head2 encrypt
+
+Alias for L</encode>, for compatibility with v0.3.x hashids.js API.
+
+=head2 encode_hex
+
+    my $hash = $hashids->encode_hex('deadbeef');
 
 Encode a hex string into a hash string.
 
-=item  my $number = $hashids->decode($hash);
+=head2 decode
+
+    my $number = $hashids->decode($hash);
 
 Decode a hash string into its number (or numbers.)  Returns either a
 simple scalar if it is a single number, an arrayref of numbers if it
@@ -402,15 +415,16 @@ found:
 
     my @numbers = $hashids->decode($hash);
 
-I<decrypt()> is an alias for this method, for compatibility with v0.3.x
-hashids.js API.
+=head2 decrypt
 
-=item  my $hex_string = $hashids->decode_hex($hash);
+Alias for this L</decode>, for compatibility with v0.3.x hashids.js API.
 
-Opposite of I<encode_hex()>.  Unlike I<decode()>, this will always
-return a string, including the empty string if the hash is invalid.
+=head2 decode_hex
 
-=back
+    my $hex_string = $hashids->decode_hex($hash);
+
+Opposite of L</encode_hex>.  Unlike L</decode>, this will always return
+a string, including the empty string if the hash is invalid.
 
 =head1 SEE ALSO
 
