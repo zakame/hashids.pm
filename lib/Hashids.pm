@@ -94,23 +94,6 @@ sub BUILD {
     $self->_set_guards( \@guards );
 }
 
-sub encode {
-    my ( $self, @num ) = @_;
-
-    return '' unless @num;
-    map { return '' unless /^\d+$/ } @num;
-
-    @num = map { bignum($_) } @num;
-
-    $self->_encode( \@num );
-}
-
-sub decode {
-    my ( $self, $hash ) = @_;
-    return unless $hash;
-    $self->_decode($hash);
-}
-
 sub encode_hex {
     my ( $self, $str ) = @_;
 
@@ -142,8 +125,13 @@ sub decrypt {
     shift->decode(shift);
 }
 
-sub _encode {
-    my ( $self, $num ) = @_;
+sub encode {
+    my ( $self, @num ) = @_;
+
+    return '' unless @num;
+    map { return '' unless /^\d+$/ } @num;
+
+    my $num = [ map { bignum($_) } @num ];
 
     my @alphabet = @{ $self->chars };
     my @res;
@@ -208,7 +196,7 @@ sub _encode {
     join '' => @res;
 }
 
-sub _decode {
+sub decode {
     my ( $self, $hash ) = @_;
 
     return unless $hash;
