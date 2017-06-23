@@ -2,18 +2,18 @@ package Hashids;
 
 our $VERSION = "1.000002";
 
-use Carp       ();
-use List::Util ();
-use POSIX      ();
-use Math::BigInt;
+use Carp 'croak';
+use POSIX 'ceil';
+use Hashids::Util ':all';
 use Moo;
+use namespace::clean;
 
 has salt => ( is => 'ro', default => '' );
 
 has minHashLength => (
     is  => 'ro',
     isa => sub {
-        Carp::croak "$_[0] is not a number!" unless $_[0] =~ /^\d+$/;
+        croak "$_[0] is not a number!" unless $_[0] =~ /^\d+$/;
     },
     default => 0
 );
@@ -21,12 +21,12 @@ has minHashLength => (
 has alphabet => (
     is  => 'rwp',
     isa => sub {
-        Carp::croak "$_[0] must not have spaces"
+        croak "$_[0] must not have spaces"
             if $_[0] =~ /\s/;
-        Carp::croak "$_[0] must contain at least 16 characters"
+        croak "$_[0] must contain at least 16 characters"
             if length $_[0] < 16;
         my %u;
-        Carp::croak "$_[0] must contain unique characters"
+        croak "$_[0] must contain unique characters"
             if grep { $u{$_}++ } split // => $_[0];
     },
     default => sub { join '' => 'a' .. 'z', 'A' .. 'Z', 1 .. 9, 0 }
@@ -68,10 +68,10 @@ sub BUILD {
         @alphabet = grep { !/$sep/ } @alphabet;
     }
 
-    @seps = _consistentShuffle( \@seps, $self->salt );
+    @seps = consistent_shuffle( \@seps, $self->salt );
 
     if ( !@seps || ( @alphabet / @seps ) > $sepDiv ) {
-        my $sepsLength = POSIX::ceil( @alphabet / $sepDiv );
+        my $sepsLength = ceil( @alphabet / $sepDiv );
         $sepsLength++ if $sepsLength == 1;
         if ( $sepsLength > @seps ) {
             push @seps => splice @alphabet, 0, $sepsLength - @seps;
@@ -81,8 +81,8 @@ sub BUILD {
         # }
     }
 
-    @alphabet = _consistentShuffle( \@alphabet, $self->salt );
-    my $guardCount = POSIX::ceil( @alphabet / $guardDiv );
+    @alphabet = consistent_shuffle( \@alphabet, $self->salt );
+    my $guardCount = ceil( @alphabet / $guardDiv );
 
     @guards
         = @alphabet < 3
@@ -100,7 +100,7 @@ sub encode {
     return '' unless @num;
     map { return '' unless /^\d+$/ } @num;
 
-    @num = map { _bignum($_) } @num;
+    @num = map { bignum($_) } @num;
 
     $self->_encode( \@num );
 }
@@ -120,7 +120,7 @@ sub encode_hex {
     push @num, '1' . substr $str, 0, 11, '' while $str;
 
     # no warnings 'portable';
-    @num = map { Math::BigInt->from_hex($_) } @num;
+    @num = map { bignum(0)->from_hex($_) } @num;
 
     $self->encode(@num);
 }
@@ -131,7 +131,7 @@ sub decode_hex {
     my @res = $self->decode($hash);
 
     # as_hex includes the leading 0x, so we use three instead of 1
-    @res ? join '' => map { substr( _bignum($_)->as_hex, 3 ) } @res : '';
+    @res ? join '' => map { substr( bignum($_)->as_hex, 3 ) } @res : '';
 }
 
 sub encrypt {
@@ -148,44 +148,44 @@ sub _encode {
     my @alphabet = @{ $self->chars };
     my @res;
 
-    my $numHashInt = _bignum(0);
+    my $numHashInt = bignum(0);
     for my $i ( 0 .. $#$num ) {
         $numHashInt->badd(
-            _bignum( $num->[$i] )->bmod( _bignum( $i + 100 ) ) );
+            bignum( $num->[$i] )->bmod( bignum( $i + 100 ) ) );
     }
 
-    my $lottery = $res[0] = $alphabet[ _bignum($numHashInt)
-        ->bmod( _bignum( scalar @alphabet ) )->numify ];
+    my $lottery = $res[0] = $alphabet[ bignum($numHashInt)
+        ->bmod( bignum( scalar @alphabet ) )->numify ];
 
     for my $i ( 0 .. $#$num ) {
-        my $n = _bignum( $num->[$i] );
+        my $n = bignum( $num->[$i] );
         my @s = ( $lottery, split( // => $self->salt ), @alphabet )
             [ 0 .. @alphabet ];
 
-        @alphabet = _consistentShuffle( \@alphabet, \@s );
-        my $last = _toAlphabet( $n, \@alphabet );
+        @alphabet = consistent_shuffle( \@alphabet, \@s );
+        my $last = to_alphabet( $n, \@alphabet );
 
         push @res => split // => $last;
 
         if ( $i + 1 < @$num ) {
             my $seps = $self->seps;
-            $n->bmod( _bignum( ord($last) + $i ) );
-            my $sepsIndex = _bignum($n)->bmod( _bignum( scalar @$seps ) );
+            $n->bmod( bignum( ord($last) + $i ) );
+            my $sepsIndex = bignum($n)->bmod( bignum( scalar @$seps ) );
             push @res, $seps->[ $sepsIndex->numify ];
         }
     }
 
     if ( @res < $self->minHashLength ) {
         my $guards     = $self->guards;
-        my $guardIndex = _bignum($numHashInt)->badd( _bignum( ord $res[0] ) )
-            ->bmod( _bignum( scalar @$guards ) );
+        my $guardIndex = bignum($numHashInt)->badd( bignum( ord $res[0] ) )
+            ->bmod( bignum( scalar @$guards ) );
         my $guard = $guards->[ $guardIndex->numify ];
 
         unshift @res, $guard;
 
         if ( @res < $self->minHashLength ) {
-            $guardIndex = _bignum($numHashInt)->badd( _bignum( ord $res[2] ) )
-                ->bmod( _bignum( scalar @$guards ) );
+            $guardIndex = bignum($numHashInt)->badd( bignum( ord $res[2] ) )
+                ->bmod( bignum( scalar @$guards ) );
             $guard = $guards->[ $guardIndex->numify ];
 
             push @res, $guard;
@@ -194,7 +194,7 @@ sub _encode {
 
     my $halfLength = int @alphabet / 2;
     while ( @res < $self->minHashLength ) {
-        @alphabet = _consistentShuffle( \@alphabet, \@alphabet );
+        @alphabet = consistent_shuffle( \@alphabet, \@alphabet );
         @res = (
             @alphabet[ $halfLength .. $#alphabet ],
             @res, @alphabet[ 0 .. $halfLength - 1 ]
@@ -233,72 +233,13 @@ sub _decode {
         my @s = ( $lottery, split( // => $self->salt ), @alphabet )
             [ 0 .. @alphabet ];
 
-        @alphabet = _consistentShuffle( \@alphabet, \@s );
-        push @$res => _fromAlphabet( $part, \@alphabet );
+        @alphabet = consistent_shuffle( \@alphabet, \@s );
+        push @$res => from_alphabet( $part, \@alphabet );
     }
 
     return unless $self->Hashids::encode(@$res) eq $orig;
 
     wantarray ? @$res : @$res == 1 ? $res->[0] : $res;
-}
-
-sub _consistentShuffle {
-    my ( $alphabet, $salt ) = @_;
-
-    return wantarray ? [''] : '' unless $alphabet;
-
-    my @alphabet
-        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
-    return wantarray ? @alphabet : join '', @alphabet unless $salt;
-    my @salt = ref $salt eq 'ARRAY' ? @$salt : split //, $salt;
-
-    for ( my ( $i, $v, $p ) = ( $#alphabet, 0, 0 ); $i > 0; $i--, $v++ ) {
-        $p += my $int = ord $salt[ $v %= @salt ];
-        my $j = ( $int + $v + $p ) % $i;
-
-        @alphabet[ $j, $i ] = @alphabet[ $i, $j ];
-    }
-
-    wantarray ? @alphabet : join '', @alphabet;
-}
-
-sub _toAlphabet {
-    my ( $num, $alphabet ) = @_;
-
-    my $hash = '';
-    my @alphabet
-        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
-
-    $num = _bignum($num);
-    do {
-        $hash
-            = $alphabet[ _bignum($num)->bmod( _bignum( scalar @alphabet ) )
-            ->numify ]
-            . $hash;
-        $num->bdiv( _bignum( scalar @alphabet ) );
-    } while ( $num->bcmp( _bignum(0) ) );
-
-    $hash;
-}
-
-sub _fromAlphabet {
-    my ( $hash, $alphabet ) = @_;
-
-    my @alphabet
-        = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
-
-    my $num = _bignum(
-        List::Util::reduce { $a * @alphabet + $b }
-        map { index join( '' => @alphabet ), $_ } split // => $hash
-    );
-
-    $num->bstr;
-}
-
-sub _bignum {
-    my $n = Math::BigInt->bzero();
-    $n->round_mode('zero');
-    return $n->badd("@{[shift]}");
 }
 
 1;
