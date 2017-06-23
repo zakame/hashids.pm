@@ -39,63 +39,81 @@ This implementation is also compatible with the v0.3.x hashids.js API.
 
 # METHODS
 
-- my $hashids = Hashids->new();
+## new
 
-    Make a new Hashids object.  This constructor accepts a few options:
+    my $hashids = Hashids->new();
 
-    - salt => 'this is my salt'
+Make a new Hashids object.  This constructor accepts a few options:
 
-        Salt string, this should be unique per Hashid object.
+    my $hashids = Hashids->new(
+        salt          => 'this is my salt',
+        alphabet      => 'abcdefghijklmnop',
+        minHashLength => 8
+    );
 
-    - alphabet => 'abcdefghij'
+- salt
 
-        Alphabet set to use.  This is optional as Hashids comes with a default
-        set suitable for URL shortening.  Should you choose to supply a custom
-        alphabet, make sure that it is at least 16 characters long, has no
-        spaces, and only has unique characters.
+    Salt string, this should be unique per Hashids object.
 
-    - minHashLength => 5
+- alphabet
 
-        Minimum hash length.  Use this to control how long the generated hash
-        string should be.
+    Alphabet set to use.  This is optional as Hashids comes with a default
+    set suitable for URL shortening.  Should you choose to supply a custom
+    alphabet, make sure that it is at least 16 characters long, has no
+    spaces, and only has unique characters.
 
-    You can also construct with just a single argument for the salt:
+- minHashLength
 
-        my $hashids = Hashids->new('this is my salt');
+    Minimum hash length.  Use this to control how long the generated hash
+    string should be.
 
-- my $hash = $hashids->encode($x, \[$y, $z, ...\]);
+You can also construct with just a single argument for the salt, leaving
+the alphabet and minHashLength at their defaults:
 
-    Encode a single number (or a list of numbers) into a hash
-    string.
+    my $hashids = Hashids->new('this is my salt');
 
-    _encrypt()_ is an alias for this method, for compatibility with v0.3.x
-    hashids.js API.
+## encode
 
-- my $hash = $hashids->encode\_hex('deadbeef');
+    my $hash = $hashids->encode($x, [$y, $z, ...]);
 
-    Encode a hex string into a hash string.
+Encode a single number (or a list of numbers) into a hash string.
 
-- my $number = $hashids->decode($hash);
+## encrypt
 
-    Decode a hash string into its number (or numbers.)  Returns either a
-    simple scalar if it is a single number, an arrayref of numbers if it
-    decrypted a set, or `undef` if given bad input.  Use ["ref" in perlfunc](https://metacpan.org/pod/perlfunc#ref) on
-    the result to ensure proper usage.
+Alias for ["encode"](#encode), for compatibility with v0.3.x hashids.js API.
 
-    You can also retrieve the result as a proper list by assigning it to an
-    array variable, by doing so you will always get a list of one or more
-    numbers that are decrypted from the hash, or the empty list if none were
-    found:
+## encode\_hex
 
-        my @numbers = $hashids->decode($hash);
+    my $hash = $hashids->encode_hex('deadbeef');
 
-    _decrypt()_ is an alias for this method, for compatibility with v0.3.x
-    hashids.js API.
+Encode a hex string into a hash string.
 
-- my $hex\_string = $hashids->decode\_hex($hash);
+## decode
 
-    Opposite of _encode\_hex()_.  Unlike _decode()_, this will always
-    return a string, including the empty string if the hash is invalid.
+    my $number = $hashids->decode($hash);
+
+Decode a hash string into its number (or numbers.)  Returns either a
+simple scalar if it is a single number, an arrayref of numbers if it
+decrypted a set, or `undef` if given bad input.  Use ["ref" in perlfunc](https://metacpan.org/pod/perlfunc#ref) on
+the result to ensure proper usage.
+
+You can also retrieve the result as a proper list by assigning it to an
+array variable, by doing so you will always get a list of one or more
+numbers that are decrypted from the hash, or the empty list if none were
+found:
+
+    my @numbers = $hashids->decode($hash);
+
+## decrypt
+
+Alias for this ["decode"](#decode), for compatibility with v0.3.x hashids.js API.
+
+## decode\_hex
+
+    my $hex_string = $hashids->decode_hex($hash);
+
+Opposite of ["encode\_hex"](#encode_hex).  Unlike ["decode"](#decode), this will always return
+a string, including the empty string if the hash is invalid.
 
 # SEE ALSO
 
