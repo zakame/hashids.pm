@@ -2,6 +2,10 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.000004 2017-06-23T06:40:54Z
+
+    - Reduce calls to Hashids::Util::bignum() to further simplify code
+
 1.000003 2017-06-23T05:51:41Z
 
     - Add test for encoding lists with set minHashLength

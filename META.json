@@ -71,7 +71,7 @@
          "web" : "https://github.com/zakame/hashids.pm"
       }
    },
-   "version" : "1.000003",
+   "version" : "1.000004",
    "x_contributors" : [
       "C. A. Church <thisdroneeatspeople@gmail.com>",
       "Troy Morehouse <troymore@nbnet.nb.ca>",
