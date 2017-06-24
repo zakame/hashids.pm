@@ -1,6 +1,4 @@
 ---
-skip_tags: true
-
 clone_folder: C:\projects\hashids.pm
 
 cache:
