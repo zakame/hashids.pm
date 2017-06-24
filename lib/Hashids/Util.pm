@@ -58,10 +58,8 @@ sub from_alphabet {
     my @alphabet
         = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
 
-    my $num = bignum(
-        reduce { $a * @alphabet + $b }
-        map { index join( '' => @alphabet ), $_ } split // => $hash
-    );
+    my $num = reduce { bignum($a) * @alphabet + $b }
+    map { index join( '' => @alphabet ), $_ } split // => $hash;
 
     "$num";
 }
@@ -69,7 +67,7 @@ sub from_alphabet {
 sub bignum {
     my $n = Math::BigInt->bzero();
     $n->round_mode('zero');
-    return $n->badd("@{[shift]}");
+    $n->badd("@{[shift]}");
 }
 
 1;
