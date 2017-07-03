@@ -45,12 +45,12 @@ has seps => (
 
 has guards => ( is => 'rwp', init_arg => undef, default => sub { [] } );
 
-sub BUILDARGS {
-    my ( $class, @args ) = @_;
+around BUILDARGS => sub {
+    my ( $orig, $class, @args ) = @_;
     unshift @args, 'salt' if @args % 2 == 1;
 
-    +{@args};
-}
+    $class->$orig(@args);
+};
 
 sub BUILD {
     my $self = shift;
