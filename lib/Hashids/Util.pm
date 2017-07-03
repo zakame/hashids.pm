@@ -75,6 +75,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords arrayrefs bignum
+
 =head1 NAME
 
 Hashids::Util - Shuffling and conversion functions for Hashids

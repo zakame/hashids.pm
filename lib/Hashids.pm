@@ -230,6 +230,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords minHashLength
+
 =head1 NAME
 
 Hashids - generate short hashes from numbers
