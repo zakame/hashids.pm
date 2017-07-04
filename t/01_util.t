@@ -8,7 +8,7 @@ use Hashids::Util;
 plan tests => 1;
 
 subtest 'internal functions' => sub {
-    plan tests => 9;
+    plan tests => 11;
 
     is( Hashids::Util::consistent_shuffle( '123', 'salt' ),
         '231', 'shuffle 1' );
@@ -27,6 +27,12 @@ subtest 'internal functions' => sub {
         'iajecbhdgf',
         'shuffle with salt as list'
     );
+
+    is( Hashids::Util::consistent_shuffle( '', 'salt' ),
+        '', 'shuffle with empty alphabet' );
+
+    is( Hashids::Util::consistent_shuffle( [ 'a' .. 'j' ], '' ),
+        'abcdefghij', 'shuffle with empty salt' );
 
     is( Hashids::Util::to_alphabet( 123, 'abcdefghij' ),
         'bcd', 'internal to_alphabet' );
