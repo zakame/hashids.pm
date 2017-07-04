@@ -5,10 +5,10 @@ use warnings;
 use Test::More;
 use Hashids::Util;
 
-plan tests => 1;
+plan tests => 2;
 
-subtest 'internal functions' => sub {
-    plan tests => 11;
+subtest 'consistent shuffle' => sub {
+    plan tests => 8;
 
     is( Hashids::Util::consistent_shuffle( '123', 'salt' ),
         '231', 'shuffle 1' );
@@ -33,6 +33,10 @@ subtest 'internal functions' => sub {
 
     is( Hashids::Util::consistent_shuffle( [ 'a' .. 'j' ], '' ),
         'abcdefghij', 'shuffle with empty salt' );
+};
+
+subtest 'alphabet conversion' => sub {
+    plan tests => 3;
 
     is( Hashids::Util::to_alphabet( 123, 'abcdefghij' ),
         'bcd', 'internal to_alphabet' );
