@@ -21,13 +21,12 @@ has minHashLength => (
 has alphabet => (
     is  => 'rwp',
     isa => sub {
-        croak "$_[0] must not have spaces"
-            if $_[0] =~ /\s/;
-        croak "$_[0] must contain at least 16 characters"
-            if length $_[0] < 16;
+        local $_ = shift;
+        croak "$_ must not have spaces" if /\s/;
+        croak "$_ must contain at least 16 characters" if 16 > length;
         my %u;
-        croak "$_[0] must contain unique characters"
-            if grep { $u{$_}++ } split // => $_[0];
+        croak "$_ must contain unique characters"
+            if grep { $u{$_}++ } split //;
     },
     default => sub { join '' => 'a' .. 'z', 'A' .. 'Z', 1 .. 9, 0 }
 );
