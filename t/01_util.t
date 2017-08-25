@@ -43,7 +43,7 @@ subtest 'alphabet conversion' => sub {
     is( Hashids::Util::from_alphabet( 'bcd', 'abcdefghij' ),
         123, 'internal from_alphabet' );
 
-    subtest '_hash/_unhash with list' => sub {
+    subtest 'to/from alphabet with list' => sub {
         plan tests => 2;
 
         my @alphabet = qw(a b c d e f g h i j);
