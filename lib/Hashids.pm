@@ -155,7 +155,7 @@ sub encode {
 
         if ( $i + 1 < @$num ) {
             $n %= ord($last) + $i;
-            my $sepsIndex = $n % @{$self->seps};
+            my $sepsIndex = $n % @{ $self->seps };
             push @res, $self->seps->[$sepsIndex];
         }
     }
