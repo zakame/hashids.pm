@@ -84,12 +84,15 @@ subtest 'basics' => sub {
 };
 
 subtest 'simple encode/decode' => sub {
-    plan tests => 6;
+    plan tests => 8;
 
     my $hashids = Hashids->new( salt => $salt );
 
     is( $hashids->encode(),               '', 'no encode' );
     is( $hashids->encode('up the wazoo'), '', 'bad encode' );
+
+    is( $hashids->encode(undef), '',    'undef encode' );
+    is( $hashids->decode(),      undef, 'no decode' );
 
     my $plaintext = 123;
     my $encoded   = 'YDx';

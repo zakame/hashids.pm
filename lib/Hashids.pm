@@ -125,7 +125,7 @@ sub encode {
     my ( $self, @num ) = @_;
 
     return '' unless @num;
-    map { return '' unless /^\d+$/ } @num;
+    map { return '' unless defined and /^\d+$/ } @num;
 
     my $num = [ map { bignum($_) } @num ];
 
