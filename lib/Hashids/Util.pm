@@ -19,11 +19,11 @@ use namespace::clean -except => [qw(import)];
 sub consistent_shuffle {
     my ( $alphabet, $salt ) = @_;
 
-    return wantarray ? [''] : '' unless $alphabet;
+    return ('') unless $alphabet;
 
     my @alphabet
         = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
-    return wantarray ? @alphabet : join '', @alphabet unless $salt;
+    return @alphabet unless $salt;
     my @salt = ref $salt eq 'ARRAY' ? @$salt : split //, $salt;
 
     for ( my ( $i, $v, $p ) = ( $#alphabet, 0, 0 ); $i > 0; $i--, $v++ ) {
@@ -33,7 +33,7 @@ sub consistent_shuffle {
         @alphabet[ $j, $i ] = @alphabet[ $i, $j ];
     }
 
-    wantarray ? @alphabet : join '', @alphabet;
+    @alphabet;
 }
 
 sub to_alphabet {
@@ -100,7 +100,7 @@ C<Hashids::Util> does not export any functions by default.
 
 =head2 consistent_shuffle
 
-    my $shuffled_alphabet = consistent_shuffle( $alphabet, $salt );
+    my @shuffled_alphabet = consistent_shuffle( $alphabet, $salt );
 
 Given an alphabet and salt, produce a shuffled alphabet.  Both alphabet
 and salt can be either strings or arrayrefs of characters.

@@ -8,31 +8,32 @@ use Hashids::Util;
 plan tests => 2;
 
 subtest 'consistent shuffle' => sub {
-    plan tests => 8;
+    plan tests => 7;
+    my $res;
 
-    is( Hashids::Util::consistent_shuffle( '123', 'salt' ),
-        '231', 'shuffle 1' );
-    is( Hashids::Util::consistent_shuffle( 'abcdefghij', 'salt' ),
-        'iajecbhdgf', 'shuffle 2' );
+    $res = [ Hashids::Util::consistent_shuffle( '123', 'salt' ) ];
+    is_deeply( $res, [qw(2 3 1)], 'shuffle 1' );
+    $res = [ Hashids::Util::consistent_shuffle( 'abcdefghij', 'salt' ) ];
+    is_deeply( $res, [qw(i a j e c b h d g f)], 'shuffle 2' );
 
-    is( Hashids::Util::consistent_shuffle( [ '1', '2', '3' ], 'salt' ),
-        '231', 'shuffle alphabet list 1' );
-    is( Hashids::Util::consistent_shuffle( [ 'a' .. 'j' ], 'salt' ),
-        'iajecbhdgf', 'shuffle alphabet list 2' );
+    $res = [ Hashids::Util::consistent_shuffle( [ '1', '2', '3' ], 'salt' ) ];
+    is_deeply( $res, [qw(2 3 1)], 'shuffle alphabet list 1' );
+    $res = [ Hashids::Util::consistent_shuffle( [ 'a' .. 'j' ], 'salt' ) ];
+    is_deeply( $res, [qw(i a j e c b h d g f)], 'shuffle alphabet list 2' );
 
-    my @res = Hashids::Util::consistent_shuffle( '123', 'salt' );
-    is_deeply( \@res, [qw( 2 3 1 )], 'shuffle returns a list' );
+    $res = [
+        Hashids::Util::consistent_shuffle(
+            [ 'a' .. 'j' ],
+            [ split // => 'salt' ]
+        )
+    ];
+    is_deeply( $res, [qw(i a j e c b h d g f)], 'shuffle with salt as list' );
 
-    is( Hashids::Util::consistent_shuffle( [ 'a' .. 'j' ], [qw( s a l t )] ),
-        'iajecbhdgf',
-        'shuffle with salt as list'
-    );
+    $res = [ Hashids::Util::consistent_shuffle( '', 'salt' ) ];
+    is_deeply( $res, [''], 'shuffle with empty alphabet' );
 
-    is( Hashids::Util::consistent_shuffle( '', 'salt' ),
-        '', 'shuffle with empty alphabet' );
-
-    is( Hashids::Util::consistent_shuffle( [ 'a' .. 'j' ], '' ),
-        'abcdefghij', 'shuffle with empty salt' );
+    $res = [ Hashids::Util::consistent_shuffle( [ 'a' .. 'j' ], '' ) ];
+    is_deeply( $res, [qw(a b c d e f g h i j)], 'shuffle with empty salt' );
 };
 
 subtest 'alphabet conversion' => sub {
