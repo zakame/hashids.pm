@@ -16,9 +16,6 @@ subtest 'collision with long salt' => sub {
     my $longSecret    = '5b7130c6-8482-4800-a4d1-5a662e0a6a4f';
     my @salts         = qw(salt1 salt2);
 
-    diag "alphabet length: ", length $alphabet;
-    diag "salt length: ", 5 + length $longSecret;
-
     subtest 'secret at beginning of salt' => sub {
         plan tests => 6;
 
