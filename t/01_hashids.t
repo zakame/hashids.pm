@@ -39,7 +39,7 @@ subtest 'basics' => sub {
         throws_ok {
             Hashids->new( minHashLength => $minHashLength );
         }
-        qr/not a number/, 'invalid minHashLength';
+        qr/must be a positive number/, 'invalid minHashLength';
     };
 
     subtest 'alphabet' => sub {

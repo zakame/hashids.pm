@@ -13,7 +13,7 @@ has salt => ( is => 'ro', default => '' );
 has minHashLength => (
     is  => 'ro',
     isa => sub {
-        croak "$_[0] is not a number!" unless $_[0] =~ /^\d+$/;
+        croak "$_[0] must be a positive number" unless $_[0] =~ /^\d+$/;
     },
     default => 0
 );
