@@ -37,11 +37,8 @@ subtest 'collision with long salt' => sub {
 
             $encodes{ $h->encode($_) }++ for 1 .. 3;
 
-        TODO: {
-                local $TODO = 'needs fixing, see hashids.js issue #37';
-                cmp_ok( $encodes{$_}, '==', 1, "No duplicate for Hashid $_" )
-                    for keys %encodes;
-            }
+            cmp_ok( $encodes{$_}, '==', 1, "No duplicate for Hashid $_" )
+                for keys %encodes;
         }
     };
 
