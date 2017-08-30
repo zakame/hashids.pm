@@ -54,6 +54,9 @@ around BUILDARGS => sub {
 sub BUILD {
     my $self = shift;
 
+    croak "salt must be shorter than or of equal length to alphabet"
+        if length $self->salt > length $self->alphabet;
+
     my @alphabet = split // => $self->alphabet;
     my ( @seps, @guards );
 
@@ -284,7 +287,9 @@ Make a new Hashids object.  This constructor accepts a few options:
 
 =item  salt
 
-Salt string, this should be unique per Hashids object.
+Salt string, this should be unique per Hashids object.  Must be either
+as long or shorter than the alphabet length, as a longer salt string
+than the alphabet introduces false collisions.
 
 =item  alphabet
 

@@ -9,12 +9,20 @@ use Hashids;
 plan tests => 1;
 
 subtest 'collision with long salt' => sub {
-    plan tests => 2;
+    plan tests => 3;
 
-    my $alphabet      = join '' => ( 'A' .. 'Z', 0 .. 9 );
+    my $alphabet      = join '' => ( 'a' .. 'z', 'A' .. 'Z', 0 .. 9 );
     my $minHashLength = 20;
     my $longSecret    = '5b7130c6-8482-4800-a4d1-5a662e0a6a4f';
     my @salts         = qw(salt1 salt2);
+
+    throws_ok {
+        Hashids->new(
+            alphabet => join( '' => 'A' .. 'Z',  0 .. 9 ),
+            salt     => join( '' => $longSecret, $salts[0] )
+        );
+    }
+    qr/must be shorter than or of equal length to alphabet/, 'invalid salt';
 
     subtest 'secret at beginning of salt' => sub {
         plan tests => 6;
