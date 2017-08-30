@@ -53,7 +53,9 @@ Make a new Hashids object.  This constructor accepts a few options:
 
 - salt
 
-    Salt string, this should be unique per Hashids object.
+    Salt string, this should be unique per Hashids object.  Must be either
+    as long or shorter than the alphabet length, as a longer salt string
+    than the alphabet introduces false collisions.
 
 - alphabet
 
