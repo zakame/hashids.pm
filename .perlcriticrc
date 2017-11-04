@@ -1,0 +1,11 @@
+[NamingConventions::Capitalization]
+local_lexical_variables = :starts_with_lower
+
+[NamingConventions::ProhibitAmbiguousNames]
+forbid = abstract bases close contract left no record right second set
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moo
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moo
