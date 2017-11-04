@@ -67,11 +67,11 @@ subtest 'any() as boolean grep()' => sub {
 
     subtest 'any() tests from LMU' => sub {
         plan tests => 6;
-        my @list = (1 .. 10000);
+        my @list = (1 .. 10_000);
 
         $res = Hashids::Util::any { $_ == 5000 } @list;
         ok( $res == 1, 'any number 5000 from list variable' );
-        $res = Hashids::Util::any { $_ == 5000 } 1 .. 10000;
+        $res = Hashids::Util::any { $_ == 5000 } 1 .. 10_000;
         ok( $res == 1, 'any number 5000 from list range' );
         $res = Hashids::Util::any { defined } @list;
         ok( $res == 1, 'any defined value from list variable' );

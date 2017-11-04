@@ -99,7 +99,7 @@ subtest 'simple encode/decode' => sub {
     is( $hashids->encode($plaintext), $encoded,   'encode 1' );
     is( $hashids->decode($encoded),   $plaintext, 'decode 1' );
 
-    $plaintext = 123456;
+    $plaintext = 123_456;
     $encoded   = '4DLz6';
     is( $hashids->encode($plaintext), $encoded,   'encode 2' );
     is( $hashids->decode($encoded),   $plaintext, 'decode 2' );
