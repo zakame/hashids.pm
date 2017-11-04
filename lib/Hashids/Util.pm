@@ -91,7 +91,7 @@ Hashids::Util - Shuffling and conversion functions for Hashids
 
 =head1 SYNOPSIS
 
-    use Hashids::Util 
+    use Hashids::Util
         qw( consistent_shuffle to_alphabet from_alphabet any bignum );
 
 =head1 DESCRIPTION
