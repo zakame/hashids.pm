@@ -2,6 +2,17 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.001000 2017-11-04T09:00:59Z
+
+    - Align with v1.1.x of Hashids.js
+    - Hashids: use Class::Method::Modifiers::around() for BUILDARGS
+    - Hashids::Util: make consistent_shuffle() to always return lists
+    - Add constraint on salt length to be less than or equal to alphabet
+      length (see also https://github.com/ivanakimov/hashids.js/issues/37)
+    - Hashids::Util: add any() to avoid using boolean grep()
+    - Add more tests adapted from Hashids.js
+    - Various other small fixes suggested by Perl::Critic and kritika.io
+
 1.000005 2017-06-24T13:42:15Z
 
     - Hashids::Util: ensure we carry a bignum() upon reduce() in
