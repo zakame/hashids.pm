@@ -64,7 +64,7 @@ sub from_alphabet {
     "$num";
 }
 
-sub any (&@) {                 ## no critic: ProhibitSubroutinePrototypes
+sub any (&@) {                 ## no critic (ProhibitSubroutinePrototypes)
     my $f = shift;
     for (@_) {
         return 1 if $f->();
