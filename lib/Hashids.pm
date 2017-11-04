@@ -200,7 +200,7 @@ sub decode {
     my $orig = $hash;
 
     my $guard = join '|', map {quotemeta} @{ $self->guards };
-    my @hash = grep { !/^$/ } split /$guard/ => $hash;
+    my @hash = grep { $_ ne '' } split /$guard/ => $hash;
     my $i = ( @hash == 3 || @hash == 2 ) ? 1 : 0;
 
     return unless defined( $hash = $hash[$i] );
@@ -208,7 +208,7 @@ sub decode {
     $hash = substr $hash, 1;
 
     my $sep = join '|', @{ $self->seps };
-    @hash = grep { !/^$/ } split /$sep/ => $hash;
+    @hash = grep { $_ ne '' } split /$sep/ => $hash;
 
     my @alphabet = @{ $self->chars };
     for my $part (@hash) {
