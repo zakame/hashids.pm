@@ -1,12 +1,12 @@
 package Hashids;
 
-our $VERSION = "1.000005";
-
 use Carp 'croak';
 use POSIX 'ceil';
 use Hashids::Util ':all';
 use Moo;
 use namespace::clean;
+
+our $VERSION = "1.000005";
 
 has salt => ( is => 'ro', default => '' );
 
