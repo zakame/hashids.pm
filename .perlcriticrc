@@ -7,5 +7,5 @@ forbid = abstract bases close contract left no record right second set
 [TestingAndDebugging::RequireUseWarnings]
 equivalent_modules = Moo
 
-[TestingAndDebugging::RequireUseWarnings]
+[TestingAndDebugging::RequireUseStrict]
 equivalent_modules = Moo
