@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Hashids::Util;
 
-plan tests => 2;
+plan tests => 3;
 
 subtest 'consistent shuffle' => sub {
     plan tests => 7;
@@ -52,5 +52,34 @@ subtest 'alphabet conversion' => sub {
             'bcd', 'internal to_alphabet' );
         is( Hashids::Util::from_alphabet( 'bcd', \@alphabet ),
             123, 'internal from_alphabet' );
+    };
+};
+
+subtest 'any() as boolean grep()' => sub {
+    plan tests => 3;
+    my $res;
+
+    $res = Hashids::Util::any { /a/ } qw(a b c);
+    ok( $res == 1, 'any returns true' );
+
+    $res = Hashids::Util::any { /1/ } qw(x y z);
+    ok( $res == 0, 'any returns false' );
+
+    subtest 'any() tests from LMU' => sub {
+        plan tests => 6;
+        my @list = (1 .. 10000);
+
+        $res = Hashids::Util::any { $_ == 5000 } @list;
+        ok( $res == 1, 'any number 5000 from list variable' );
+        $res = Hashids::Util::any { $_ == 5000 } 1 .. 10000;
+        ok( $res == 1, 'any number 5000 from list range' );
+        $res = Hashids::Util::any { defined } @list;
+        ok( $res == 1, 'any defined value from list variable' );
+        $res = Hashids::Util::any { not defined } @list;
+        ok(  $res == 0, 'any undefined from list variable' );
+        $res = Hashids::Util::any { not defined } undef;
+        ok( $res == 1, 'any undefined from undef' );
+        $res = Hashids::Util::any { not defined };
+        ok( $res == 0, 'any undefined but not given a list' );
     };
 };

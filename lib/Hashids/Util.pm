@@ -7,7 +7,7 @@ our ( @EXPORT_OK, %EXPORT_TAGS );
 
 BEGIN {
     use Exporter 'import';
-    @EXPORT_OK = qw(consistent_shuffle to_alphabet from_alphabet bignum);
+    @EXPORT_OK = qw(consistent_shuffle to_alphabet from_alphabet any bignum);
     %EXPORT_TAGS = ( all => \@EXPORT_OK );
 }
 
@@ -64,6 +64,14 @@ sub from_alphabet {
     "$num";
 }
 
+sub any (&@) {                 ## no critic: ProhibitSubroutinePrototypes
+    my $f = shift;
+    for (@_) {
+        return 1 if $f->();
+    }
+    0;
+}
+
 sub bignum {
     my $n = Math::BigInt->bzero();
     $n->round_mode('zero');
@@ -84,7 +92,7 @@ Hashids::Util - Shuffling and conversion functions for Hashids
 =head1 SYNOPSIS
 
     use Hashids::Util 
-        qw( consistent_shuffle to_alphabet from_alphabet bignum );
+        qw( consistent_shuffle to_alphabet from_alphabet any bignum );
 
 =head1 DESCRIPTION
 
@@ -118,6 +126,15 @@ may be a string or an arrayref of characters.
 
 Produce a number from the given hash string and alphabet.  The given
 alphabet may be a string or arrayref of characters.
+
+=head2 any
+
+    print "At least one non-negative value"
+    any { $_ >= 0 } @list_of_numbers;
+
+Returns a true value if any item in the given list meets the given
+criterion.  Returns false otherwise.  Adapted from
+L<List::MoreUtils::PP>.
 
 =head2 bignum
 
