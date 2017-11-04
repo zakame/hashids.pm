@@ -26,7 +26,7 @@ has alphabet => (
         croak "$_ must contain at least 16 characters" if 16 > length;
         my %u;
         croak "$_ must contain unique characters"
-            if grep { $u{$_}++ } split //;
+            if any { $u{$_}++ } split //;
     },
     default => sub { join '' => 'a' .. 'z', 'A' .. 'Z', 1 .. 9, 0 }
 );
@@ -66,7 +66,7 @@ sub BUILD {
     # seps should contain only chars present in alphabet;
     # alphabet should not contain seps
     for my $sep ( @{ $self->seps } ) {
-        push @seps, $sep if grep {/$sep/} @alphabet;
+        push @seps, $sep if any {/$sep/} @alphabet;
         @alphabet = grep { !/$sep/ } @alphabet;
     }
 
