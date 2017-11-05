@@ -130,7 +130,7 @@ alphabet may be a string or arrayref of characters.
 =head2 any
 
     print "At least one non-negative value"
-    any { $_ >= 0 } @list_of_numbers;
+        if any { $_ >= 0 } @list_of_numbers;
 
 Returns a true value if any item in the given list meets the given
 criterion.  Returns false otherwise.  Adapted from
