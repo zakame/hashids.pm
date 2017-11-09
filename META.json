@@ -64,7 +64,7 @@
       "bugtracker" : {
          "web" : "https://github.com/zakame/hashids.pm/issues"
       },
-      "homepage" : "https://github.com/zakame/hashids.pm",
+      "homepage" : "http://hashids.org/perl",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/zakame/hashids.pm.git",

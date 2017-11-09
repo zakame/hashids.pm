@@ -1,3 +1,4 @@
 name="Hashids"
 badges = ['travis', 'coveralls', 'metacpan', 'appveyor']
 license = "mit"
+homepage = "http://hashids.org/perl"
