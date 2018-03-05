@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
 use Test::Exception;
@@ -27,7 +28,7 @@ subtest 'basics' => sub {
     is( $hashids->salt, $salt, 'single-arg constructor' );
 
     subtest 'hash length' => sub {
-        plan tests => 3;
+        plan tests => 4;
 
         is( $hashids->minHashLength, 0, 'default minHashLength' );
 
@@ -39,7 +40,14 @@ subtest 'basics' => sub {
         throws_ok {
             Hashids->new( minHashLength => $minHashLength );
         }
-        qr/must be a positive number/, 'invalid minHashLength';
+        qr/must be a positive number/, 'invalid minHashLength (string)';
+
+        $minHashLength = '４２';
+        throws_ok {
+            Hashids->new( minHashLength => $minHashLength );
+        }
+        qr/must be a positive number/,
+            'invalid minHashLength (Unicode digits)';
     };
 
     subtest 'alphabet' => sub {
@@ -170,12 +178,15 @@ subtest 'list encode/decode' => sub {
 subtest 'work with counting numbers only' => sub {
     my $hashids = Hashids->new();
 
-    plan tests => 4;
+    plan tests => 6;
 
     is( $hashids->encode(12.3), '', 'not an integer' );
     is( $hashids->encode(-1),   '', 'not a positive integer' );
     is( $hashids->encode( 123, 45.6 ), '', 'no integer in list' );
     is( $hashids->encode( -1, -2, 3 ), '', 'negative integers in list' );
+
+    is( $hashids->encode('４２'), '', 'Unicode digits' );
+    is( $hashids->encode( 1, '２', 3 ), '', 'Unicode digits in list' );
 };
 
 subtest 'encode hex strings' => sub {
