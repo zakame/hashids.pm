@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -71,11 +71,11 @@
          "web" : "https://github.com/zakame/hashids.pm"
       }
    },
-   "version" : "1.001000",
+   "version" : "1.001001",
    "x_contributors" : [
       "C. A. Church <thisdroneeatspeople@gmail.com>",
       "Troy Morehouse <troymore@nbnet.nb.ca>",
       "Zak B. Elep <zakame@zakame.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

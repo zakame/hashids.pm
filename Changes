@@ -2,6 +2,12 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.001001 2018-03-05T11:40:03Z
+
+    - Use "[0-9]" instead of "\d" in number matches to prevent possible
+      Unicode digit issues
+    - Fix example for Hashids::Util::any()
+
 1.001000 2017-11-04T09:00:59Z
 
     - Align with v1.1.x of Hashids.js
