@@ -13,7 +13,7 @@ Hashids - generate short hashes from numbers
     my $number = $hashids->decode('YDx');      # 123
 
     # or a list
-    $hash = $hashids->encode(1, 2, 3);         # 'eGtrS8'
+    $hash = $hashids->encode(1, 2, 3);         # 'laHquq'
     my @numbers = $hashids->decode('laHquq');  # (1, 2, 3)
 
     # also get results in an arrayref
