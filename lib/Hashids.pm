@@ -101,7 +101,6 @@ sub encode_hex {
     my @num;
     push @num, '1' . substr $str, 0, 11, '' while $str;
 
-    # no warnings 'portable';
     @num = map { bignum(0)->from_hex($_) } @num;
 
     $self->encode(@num);
@@ -112,8 +111,7 @@ sub decode_hex {
 
     my @res = $self->decode($hash);
 
-    # as_hex includes the leading 0x, so we use three instead of 1
-    @res ? join '' => map { substr( bignum($_)->as_hex, 3 ) } @res : '';
+    @res ? join '' => map { substr( bignum($_)->to_hex, 1 ) } @res : '';
 }
 
 sub encrypt {
