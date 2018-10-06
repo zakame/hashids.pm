@@ -4,7 +4,7 @@ requires 'Carp',                  '0';
 requires 'Exporter',           '5.57';
 requires 'List::Util',            '0';
 requires 'Moo',            '1.003000';
-requires 'Math::BigInt',     '1.9998';
+requires 'Math::BigInt',   '1.999813';
 requires 'namespace::clean',   '0.27';
 requires 'POSIX',                 '0';
 
