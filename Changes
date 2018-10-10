@@ -2,6 +2,11 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.001010 2018-10-10T05:36:22Z
+
+    - Fix output comment in synopsis, thanks to Dai Okabayashi
+    - Small update on the hex methods, needing a bump of Math::BigInt
+
 1.001001 2018-03-05T11:40:03Z
 
     - Use "[0-9]" instead of "\d" in number matches to prevent possible
