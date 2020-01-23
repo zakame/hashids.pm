@@ -46,7 +46,7 @@ sub to_alphabet {
     $num = bignum($num);
     do {
         $hash = $alphabet[ $num % @alphabet ] . $hash;
-        $num /= @alphabet;
+        $num = int($num / @alphabet);
     } while ( $num != 0 );
 
     $hash;
