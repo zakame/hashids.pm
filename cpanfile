@@ -9,6 +9,7 @@ requires 'namespace::clean',   '0.27';
 requires 'POSIX',                 '0';
 
 on 'test' => sub {
+    requires 'bignum',              '0';
     requires 'Test::More',       '0.98';
     requires 'Test::Exception',  '0.32';
 };
