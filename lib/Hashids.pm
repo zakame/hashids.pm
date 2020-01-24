@@ -6,7 +6,7 @@ use Hashids::Util ':all';
 use Moo;
 use namespace::clean;
 
-our $VERSION = "1.001010";
+our $VERSION = "1.001011";
 
 has salt => ( is => 'ro', default => '' );
 

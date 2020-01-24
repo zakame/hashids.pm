@@ -2,6 +2,12 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.001011 2020-01-24T03:52:21Z
+
+    - Hashids::Util: fix possible infinite loop in to_alphabet() when
+      bignum pragma is loaded, thanks to mla (closes #14)
+    - Adjust Travis and AppVeyor CI configurations  
+
 1.001010 2018-10-10T05:36:22Z
 
     - Fix output comment in synopsis, thanks to Dai Okabayashi
