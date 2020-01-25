@@ -9,7 +9,7 @@ use Hashids::Util;
 
 plan tests => 2;
 
-ok( bignum::in_effect(), 'bignum pragma is loaded' );
+ok( ref(222) ne '', 'bignum pragma is loaded' );
 
 subtest 'should not enter into an infinite loop under bignum pragma' => sub {
     plan tests => 2;
