@@ -2,6 +2,10 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.001012 2020-01-25T02:25:44Z
+
+    - Fix bignum pragma check in misc test
+
 1.001011 2020-01-24T03:52:21Z
 
     - Hashids::Util: fix possible infinite loop in to_alphabet() when
