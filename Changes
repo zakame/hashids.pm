@@ -2,6 +2,11 @@ Revision history for Perl extension Hashids
 
 {{$NEXT}}
 
+1.001013 2020-12-17T07:40:44Z
+
+    - Maintenance release, no functional changes
+    - Switch from Travis CI to GitHub Actions
+
 1.001012 2020-01-25T02:25:44Z
 
     - Fix bignum pragma check in misc test
