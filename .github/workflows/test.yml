@@ -14,6 +14,9 @@ jobs:
     strategy:
       matrix:
         perl-version: [ "5.32", "5.30" ]
+        include:
+          - perl-version: "5.32"
+            coverage: true
     container: ${{ format('perl:{0}', matrix.perl-version) }}
     steps:
       - uses: actions/checkout@v2
@@ -21,3 +24,10 @@ jobs:
         run: cpanm --notest --quiet --installdeps .
       - name: Run tests
         run: perl Build.PL && ./Build && ./Build test
+      - name: Check test coverage
+        if: ${{ matrix.coverage }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cpanm --notest --quiet Devel::Cover::Report::Coveralls
+          cover -test -report Coveralls
