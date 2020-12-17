@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -79,6 +79,6 @@
       "Zak B. Elep <zakame@zakame.net>",
       "bayashi <bayashi@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.05",
    "x_static_install" : 1
 }
