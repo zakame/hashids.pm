@@ -3,9 +3,7 @@ name: Test on latest supported Perls
 on:
   push:
     branches:
-      - '**'
-    tags-ignore:
-      - '*'
+      - master
   pull_request:
 
 jobs:
