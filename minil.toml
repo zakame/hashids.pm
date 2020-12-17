@@ -1,4 +1,4 @@
 name="Hashids"
-badges = ['travis', 'coveralls', 'metacpan', 'appveyor']
+badges = ['github-actions/Test on latest supported Perls', 'coveralls', 'metacpan', 'appveyor']
 license = "mit"
 homepage = "http://hashids.org/perl"
