@@ -1,0 +1,23 @@
+name: Test on latest supported Perls
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        perl-version: [ "5.32", "5.30" ]
+    container: ${{ format('perl:{0}', matrix.perl-version) }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: cpanm --notest --quiet --installdeps .
+      - name: Run tests
+        run: perl Build.PL && ./Build && ./Build test
