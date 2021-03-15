@@ -33,13 +33,13 @@ has alphabet => (
 
 has chars => ( is => 'rwp', init_arg => undef, default => sub { [] } );
 
-has seps => (
+has separators => (
     is       => 'rwp',
-    init_arg => undef,
-    default  => sub {
-        my @seps = qw(c f h i s t u);
-        [ @seps, map {uc} @seps ];
+    isa      => sub {
+        local $_ = shift;
+        croak "$_ must not have spaces" if /\s/;
     },
+    default  => sub { 'cfhistuCFHISTU' }
 );
 
 has guards => ( is => 'rwp', init_arg => undef, default => sub { [] } );
@@ -58,14 +58,15 @@ sub BUILD {
         if length $self->salt > length $self->alphabet;
 
     my @alphabet = split // => $self->alphabet;
-    my ( @seps, @guards );
+    my @seps = split // => $self->separators;
+    my @guards;
 
     my $sepDiv   = 3.5;
     my $guardDiv = 12;
 
-    # seps should contain only chars present in alphabet;
-    # alphabet should not contain seps
-    for my $sep ( @{ $self->seps } ) {
+    # separators should contain only chars present in alphabet;
+    # alphabet should not contain separators
+    for my $sep ( @seps ) {
         push @seps, $sep if any {/$sep/} @alphabet;
         @alphabet = grep { !/$sep/ } @alphabet;
     }
@@ -89,7 +90,7 @@ sub BUILD {
         : splice @alphabet, 0, $guardCount;
 
     $self->_set_chars( \@alphabet );
-    $self->_set_seps( \@seps );
+    $self->_set_separators( \@seps );
     $self->_set_guards( \@guards );
 }
 
@@ -152,8 +153,8 @@ sub encode {
 
         if ( $i + 1 < @$num ) {
             $n %= ord($last) + $i;
-            my $sepsIndex = $n % @{ $self->seps };
-            push @res, $self->seps->[$sepsIndex];
+            my $sepsIndex = $n % @{ $self->separators };
+            push @res, $self->separators->[$sepsIndex];
         }
     }
 
@@ -205,7 +206,7 @@ sub decode {
     my $lottery = substr $hash, 0, 1;
     $hash = substr $hash, 1;
 
-    my $sep = join '|', @{ $self->seps };
+    my $sep = join '|', @{ $self->separators };
     @hash = grep { $_ ne '' } split /$sep/ => $hash;
 
     my @alphabet = @{ $self->chars };
@@ -278,7 +279,8 @@ Make a new Hashids object.  This constructor accepts a few options:
     my $hashids = Hashids->new(
         salt          => 'this is my salt',
         alphabet      => 'abcdefghijklmnop',
-        minHashLength => 8
+        minHashLength => 8,
+        seperators    => 'aeiouy'
     );
 
 =over
@@ -300,6 +302,12 @@ spaces, and only has unique characters.
 
 Minimum hash length.  Use this to control how long the generated hash
 string should be.
+
+=item  separators
+
+Separator set to use.  This is optional as Hashids comes with a default
+set of separators characters.  Should you choose to supply custom
+separators (which can be an empty ''), make sure there are no spaces.
 
 =back
 
@@ -386,6 +394,10 @@ Zak B. Elep E<lt>zakame@cpan.orgE<gt>
 
 Original Hashids JavaScript library written by L<Ivan
 Akimov|http://twitter.com/ivanakimov>
+
+=head1 CONTRIBUTORS
+
+Randolf Richardson E<lt>randolf@richardson.twE<gt>
 
 =head1 THANKS
 
